@@ -2,7 +2,7 @@
 export default function Profile() {
  
   return (
-  <section className="max-w-[1146px] ml-auto bg-amber-300 min-h-screen">
+ <section className="min-h-screen text-white container lg:max-w-[80%] xl:max-w-[85%] max-w-full lg:ml-auto">
 
   Profile
   </section>

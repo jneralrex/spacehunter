@@ -17,16 +17,16 @@ export default function LeftSidebar() {
 
   return (
     <>
-    <aside className="hidden lg:flex flex-col items-center border-r border-green-100  py-4  fixed min-h-screen">
+    <aside className="hidden lg:flex flex-col items-center border-r border-green-100 py-4 fixed min-h-screen">
       <nav className="space-y-6 pt-4">
-           <Link href="/" className="flex z-40 font-semibold text-2xl">
+           <Link href="/" className="flex z-40 font-semibold text-2xl text-white">
             space <span className="text-green-600">hunters</span>
           </Link>       
            {navItems.map((item, idx) => (
           <button
             key={idx}
             onClick={() => router.push(item.href)}
-            className="flex items-center gap-3 text-grey-950 hover:text-green-900 font-medium transition"
+            className="flex items-center gap-3 text-white hover:text-green-600 font-medium transition"
           >
             {item.icon}
             {item.label}
@@ -40,7 +40,7 @@ export default function LeftSidebar() {
     </aside>
     
       {/* MOBILE BOTTOM NAV */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-green-100 flex justify-around items-center py-2 px-4 shadow-lg xl:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-green-100 flex justify-around items-center py-2 px-4 shadow-lg lg:hidden z-50">
         {navItems.map((item, idx) => (
           <button
             key={idx}

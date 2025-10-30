@@ -80,7 +80,7 @@ const Page = () => {
               <p className="mt-2 text-center text-blue-600 dark:text-blue-400 font-semibold">
                 Budget: {housemate.budget}
               </p>
-              <Link href={`/find-housmate/browse/user/more-details/${housemate.id}`} className="block mt-4 text-center bg-blue-600 text-white py-2 rounded-lg">
+              <Link href={`/find-housemate/browse/user/more-details/${housemate.id}`} className="block mt-4 text-center bg-blue-600 text-white py-2 rounded-lg">
                 View Profile
               </Link>
             </div>

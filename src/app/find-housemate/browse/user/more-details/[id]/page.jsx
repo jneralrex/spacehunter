@@ -82,7 +82,7 @@ const Page = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 py-12 px-6">
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
         {/* Profile Header */}
-         <button className="bg-black text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"><Link href="/find-housmate/browse">See more      </Link>
+         <button className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"><Link href="/find-housmate/browse">See more      </Link>
       </button>
         <div className="flex items-center gap-6">
           <Image

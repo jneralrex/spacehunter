@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -149,9 +150,11 @@ export default function Home() {
             Join thousands already finding their dream homes and housemates with
             <strong> SpaceHunter.</strong>
           </p>
+          <Link href='/auth/sign-in'>
           <button className="bg-white text-green-700 px-8 py-3 rounded-full font-semibold hover:bg-green-50 transition">
             Get Started
           </button>
+          </Link>
         </section>
       </MaxWidthWrapper>
     </main>

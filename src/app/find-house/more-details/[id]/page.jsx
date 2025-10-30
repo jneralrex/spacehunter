@@ -62,7 +62,7 @@ const HouseDetail = () => {
       {/* Hero Image */}
 
 
-      <button className="bg-black text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"><Link href="/find-house">See more      </Link>
+      <button className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"><Link href="/find-house">See more      </Link>
       </button>
 
 

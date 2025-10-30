@@ -24,7 +24,7 @@ export default function Home() {
     : allListings;
 
   return (
-    <div className="bg-slate-50">
+    <div className="">
       {/* Hero Section */}
       <section
         className="relative h-[250px] flex flex-col items-center justify-center text-center bg-cover bg-center"
@@ -128,7 +128,7 @@ export default function Home() {
    
 
       {/* Other Rentals */}
-      <section className="py-12 bg-gray-100">
+      <section className="py-12">
         <MaxWidthWrapper>
           <h2 className="text-3xl font-semibold text-gray-800 mb-6">
             Explore More Rentals
