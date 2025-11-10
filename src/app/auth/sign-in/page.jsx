@@ -1,25 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation"; 
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import useLoadingStore from "@/utils/store/useLoading";
+import { logUserIn } from "@/utils/axios/authEndPoints";
 
 export default function LandlordSignIn() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const router = useRouter(); // Initialize router
+  const { register, handleSubmit } = useForm();
+  const router = useRouter(); 
+  const { loading, setLoading } = useLoadingStore();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Signing in...", form);
-
-    // Simulate authentication (Replace with actual API request)
-    setTimeout(() => {
-      router.push("/home"); // Navigate to /manage
-    }, 1000);
+  const onSubmit = async (formData) => {
+    try {
+      setLoading(true);
+      const user = await logUserIn(formData);
+      if (!user) return;
+      router.push("/home");
+    } catch (error) {
+      console.error("Sign-in failed:", error?.response?.data?.error?.message || error?.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,27 +29,27 @@ export default function LandlordSignIn() {
       <div className="bg-white p-8 shadow-md rounded-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-4">Sign In</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input
+            placeholder="youremail@email.com"
             type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            required
+            {...register("email")}
             className="w-full p-3 border rounded-md"
+            required
           />
           <input
             type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
+            {...register("password")}
             placeholder="Password"
             required
             className="w-full p-3 border rounded-md"
           />
-          <button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md">
-            Sign In
+          <button
+            disabled={loading}
+            type="submit"
+            className={`w-full py-2 rounded-md text-white ${loading ? "bg-gray-600 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
+          >
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 

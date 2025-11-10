@@ -1,0 +1,47 @@
+import useAuthStore from "../store/useAuthStore";
+import api from "./axiosInstance";
+
+export async function dashBoardListings() {
+  try {
+    const { data } = await api.get("/dashboard/explore");
+    
+    console.log("Dashboard",data)
+
+    return data;
+  } catch (error) {
+    console.log(error)
+    console.error("fetching house failed:", error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+}
+
+export async function uploadRoomateRequest(formData) {
+  try {
+    alert("Fired")
+    const { data } = await api.post("housemate/search", formData);
+    console.log(formData)
+    if(data.status){
+      alert("good");
+    }
+    console.log(data)
+    return data;
+  } catch (error) {
+    console.log("error", error)
+    console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+
+export async function singleHouse(id) {
+  try {
+    const { data } = await api.get(`houseupload/single-listings/${id}`);
+    
+    console.log("House",data)
+
+    return data;
+    } catch (error) {
+    console.log(error)
+    console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};

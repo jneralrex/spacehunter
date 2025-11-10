@@ -1,9 +1,12 @@
 "use client";
 
+import useAuthStore from "@/utils/store/useAuthStore";
 import { ChevronsUp, House, MailPlus, Megaphone, Printer } from "lucide-react";
 import Image from "next/image";
 
 export default function RightSideBar() {
+
+  const {user} = useAuthStore();
   return (
       <>
       {/* RIGHT SIDEBAR */}
@@ -12,15 +15,15 @@ export default function RightSideBar() {
           <div className="bg-white rounded-2xl shadow flex flex-col p-4">
             <div className="flex items-center gap-3 ">
               <Image
-                src="/profile.webp"
+                src={user?.profileImage}
                 alt="User"
                 width={50}
                 height={50}
                 className="rounded-full size-[50px] object-cover"
               />
               <div>
-                <h3 className="font-semibold text-gray-950">Hi, John Doe</h3>
-                <p className="text-sm text-gray-500">@john_doe</p>
+                <h3 className="font-semibold text-gray-950">Hi, {user?.username}</h3>
+                <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
             </div>
             <button className="mt-4 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition">
