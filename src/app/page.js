@@ -42,6 +42,43 @@ export default function Home() {
             enjoy a transparent rental experience — all in one place.
           </p>
 
+            {/* CTA */}
+        <Roll
+          delay={200} 
+          duration={1000} 
+          fraction={0.5}
+          triggerOnce 
+        >
+          <section className="mt-20 mx-auto text-center bg-green-600 text-white py-16 px-6 rounded-3xl max-w-4xl shadow-2xl">
+            <h2 className="text-3xl font-bold mb-4">
+              Start Your Space Hunt Today
+
+            </h2>
+            <p className="mb-8 text-lg text-green-100">
+              Join thousands already finding their dream homes and housemates with
+              <strong> SpaceHunter.</strong>
+            </p>
+
+            <Zoom
+              delay={500} 
+              duration={1000} 
+              fraction={1}
+              triggerOnce 
+              >
+            <Link href='/auth/sign-in'>
+              <button className="bg-white text-green-700 px-8 py-3 rounded-full font-semibold hover:bg-green-100 transition">
+                Get Started
+              </button>
+            </Link>
+            </Zoom>
+          </section>
+        </Roll>
+        </section>
+
+       
+
+        <section className="mt-20 max-w-4xl text-center mx-auto">
+
           <div className="grid md:grid-cols-2 gap-10 text-left">
 
             <JackInTheBox
@@ -75,8 +112,7 @@ export default function Home() {
             </JackInTheBox>
 
           </div>
-        </section>
-
+          </section>
         {/* Owner Invite Section */}
         <section className="mt-24 max-w-5xl mx-auto text-center bg-white/75 backdrop-blur-md border border-green-200 rounded-3xl shadow-lg p-10">
           <motion.h2
@@ -115,37 +151,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA */}
-        <Roll
-          delay={200} 
-          duration={1000} 
-          fraction={1}
-          triggerOnce 
-        >
-          <section className="mt-20 mx-auto text-center bg-green-600 text-white py-16 px-6 rounded-3xl max-w-4xl shadow-2xl">
-            <h2 className="text-3xl font-bold mb-4">
-              Start Your Space Hunt Today
-
-            </h2>
-            <p className="mb-8 text-lg text-green-100">
-              Join thousands already finding their dream homes and housemates with
-              <strong> SpaceHunter.</strong>
-            </p>
-
-            <Zoom
-              delay={1500} 
-              duration={1000} 
-              fraction={1}
-              triggerOnce 
-              >
-            <Link href='/auth/sign-in'>
-              <button className="bg-white text-green-700 px-8 py-3 rounded-full font-semibold hover:bg-green-100 transition">
-                Get Started
-              </button>
-            </Link>
-            </Zoom>
-          </section>
-        </Roll>
+      
       </MaxWidthWrapper>
     </main>
   );

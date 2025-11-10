@@ -15,6 +15,8 @@ import {
   FaCalendarAlt,
   FaHeart,
 } from "react-icons/fa";
+import { FaLocationDot } from "react-icons/fa6";
+
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { singleHouse } from "@/utils/axios/houseEndPoints";
 import useLoadingStore from "@/utils/store/useLoading";
@@ -94,18 +96,19 @@ const HouseDetail = () => {
 
       {/* House Info */}
       <div className="mt-6 flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">{house.title}</h1>
-        <p className="text-xl text-gray-700 font-semibold">
+        <h1 className="text-3xl font-bold text-green-500">{house.title}</h1>
+        <p className="text-xl text-gray-400 font-semibold">
           {house.currency?.toUpperCase()} {house.price}
         </p>
-        <p className="text-gray-600">
-          {house.location?.streetAddress}, {house.location?.lgaOrCountyOrDistrict},{" "}
+        <p className="text-gray-400">
+          <span><FaLocationDot size={20}/></span>
+         {house.location?.streetAddress}, {house.location?.lgaOrCountyOrDistrict},{" "}
           {house.location?.state}, {house.location?.country}
         </p>
       </div>
 
       {/* House Features */}
-      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-6 text-gray-700 text-lg">
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-6 text-gray-400 text-lg">
         <FeatureItem icon={FaBed} label="Bedrooms" value={house.bedrooms} />
         <FeatureItem icon={FaCouch} label="Living Rooms" value={house.livingRooms} />
         <FeatureItem icon={FaToilet} label="Toilets" value={house.toilets} />
@@ -121,12 +124,15 @@ const HouseDetail = () => {
       </div>
 
       {/* Description */}
-      <p className="mt-4 text-gray-700 leading-relaxed">{house.description}</p>
+        <div>
+          <h2 className="text-2xl font-semibold mb-2 text-green-500 mt-4">Description</h2>
+         <p className=" text-gray-400 leading-relaxed">{house.description}</p>
 
+        </div>
       {/* Amenities */}
       {house.amenities && (
         <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-2">Amenities</h2>
+          <h2 className="text-2xl font-semibold mb-2 text-green-500">Amenities</h2>
           <ul className="flex flex-wrap gap-2">
             {house.amenities.map((amenity, idx) => (
               <li
@@ -142,7 +148,7 @@ const HouseDetail = () => {
 
       {/* Gallery */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold">Gallery</h2>
+        <h2 className="text-2xl font-semibold text-green-500">Gallery</h2>
         {house?.otherImages &&
           Object.entries(house.otherImages).map(([category, images]) => (
             images.length > 0 && (
@@ -184,7 +190,7 @@ const HouseDetail = () => {
           {interested ? "Interested" : "Show Interest"}
         </button>
 
-        <p className="mt-2 text-gray-700">
+        <p className="mt-2 text-gray-400">
           {engagement?.interestCount || 0}{" "}
           {engagement?.interestCount === 1 ? "person has" : "people have"} shown
           interest.

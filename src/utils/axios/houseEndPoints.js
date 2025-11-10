@@ -1,11 +1,10 @@
-import useAuthStore from "../store/useAuthStore";
 import api from "./axiosInstance";
 
 export async function dashBoardListings() {
   try {
     const { data } = await api.get("/dashboard/explore");
-    
-    console.log("Dashboard",data)
+
+    console.log("Dashboard", data)
 
     return data;
   } catch (error) {
@@ -18,9 +17,9 @@ export async function dashBoardListings() {
 export async function uploadRoomateRequest(formData) {
   try {
     alert("Fired")
-    const { data } = await api.post("housemate/search", formData);
+    const { data } = await api.post("/housemate/search", formData);
     console.log(formData)
-    if(data.status){
+    if (data.status) {
       alert("good");
     }
     console.log(data)
@@ -32,14 +31,29 @@ export async function uploadRoomateRequest(formData) {
   }
 };
 
-export async function singleHouse(id) {
+
+export async function allHouseListings(page = 1, limit = 9) {
   try {
-    const { data } = await api.get(`houseupload/single-listings/${id}`);
-    
-    console.log("House",data)
+    const { data } = await api.get(`/houseupload/all-listings?page=${page}&limit=${limit}`);
+    console.log("All House", data)
 
     return data;
-    } catch (error) {
+
+  } catch (error) {
+    console.log(error)
+    console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+
+export async function singleHouse(id) {
+  try {
+    const { data } = await api.get(`/houseupload/single-listings/${id}`);
+
+    console.log("House", data)
+
+    return data;
+  } catch (error) {
     console.log(error)
     console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
     throw error;

@@ -6,6 +6,7 @@ import FeedGrid from "@/components/FeedGrid";
 import RightSideBar from "@/components/RightSideBar";
 import useLoadingStore from "@/utils/store/useLoading";
 import { dashBoardListings } from "@/utils/axios/houseEndPoints";
+import useAuthStore from "@/utils/store/useAuthStore";
 
 
 export default function HomePage() {
@@ -14,6 +15,9 @@ export default function HomePage() {
   const [allListings, setAllListings] = useState([]);
   const [allHousemates, setAllHousemates] = useState([]);
   const {loading, setLoading} = useLoadingStore();
+  
+  const user = useAuthStore();
+
 
   const tabs = [
     { key: "all", label: "All" },

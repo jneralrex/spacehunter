@@ -1,47 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
-
-const housemates = [
-  {
-    id: 1,
-    name: "Sarah O.",
-    age: 27,
-    location: "Lagos, Nigeria",
-    budget: "$400 - $600",
-    image: "/images/user-2.png",
-    bio: "Looking for a friendly and clean housemate. Preferably female.",
-  },
-  {
-    id: 2,
-    name: "John D.",
-    age: 30,
-    location: "Abuja, Nigeria",
-    budget: "$300 - $500",
-    image: "/images/user-1.png",
-    bio: "Work-from-home professional looking for a quiet place.",
-  },
-  {
-    id: 3,
-    name: "Amaka C.",
-    age: 25,
-    location: "Port Harcourt, Nigeria",
-    budget: "$250 - $450",
-    image: "/images/user-3.png",
-    bio: "Love socializing but also value my personal space. Looking for a respectful housemate.",
-  },
-];
+import { allRoomateListings } from "@/utils/axios/houseMatesEndPoints";
 
 const Page = () => {
   const [search, setSearch] = useState("");
+  const [allHouseMates, setAllHouseMates] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredHousemates = housemates.filter((housemate) =>
-    housemate.name.toLowerCase().includes(search.toLowerCase()) ||
-    housemate.location.toLowerCase().includes(search.toLowerCase())
-  );
+  const getHouseMates = async () => {
+    try {
+      const res = await allRoomateListings();
+      console.log("aLL HOUSEMATES", res);
+
+      // your API response: res.data.roommateRequests = Array of users
+      setAllHouseMates(res || []);
+    } catch (error) {
+      console.error("Error fetching housemates:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getHouseMates();
+  }, []);
+
+  // Filter by search text (name or location)
+  const filteredHousemates = allHouseMates.filter((hm) => {
+    const name = hm.userId?.username?.toLowerCase() || "";
+    const location =
+      `${hm.location?.state || ""}, ${hm.location?.country || ""}`.toLowerCase();
+    return (
+      name.includes(search.toLowerCase()) ||
+      location.includes(search.toLowerCase())
+    );
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500 dark:text-gray-400 text-lg">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 py-12 px-6">
@@ -62,25 +67,41 @@ const Page = () => {
       {/* Housemate List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {filteredHousemates.length > 0 ? (
-          filteredHousemates.map((housemate) => (
+          filteredHousemates.map((hm) => (
             <div
-              key={housemate.id}
-              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg"
+              key={hm._id}
+              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-xl transition"
             >
-              <Image
-                src={housemate.image}
-                alt={housemate.name}
-                width={100}
-                height={100}
-                className="w-24 h-24 mx-auto rounded-full object-cover"
-              />
-              <h2 className="text-xl font-semibold text-center mt-4">{housemate.name}</h2>
-              <p className="text-gray-600 dark:text-gray-400 text-center">{housemate.location}</p>
-              <p className="text-gray-700 dark:text-gray-300 text-center text-sm">{housemate.bio}</p>
-              <p className="mt-2 text-center text-blue-600 dark:text-blue-400 font-semibold">
-                Budget: {housemate.budget}
+              <div className="flex justify-center">
+                <Image
+                  src={
+                    hm.userId?.profilePics ||
+                    "/images/default-user.png"
+                  }
+                  alt={hm.userId?.username || "Housemate"}
+                  width={100}
+                  height={100}
+                  className="w-24 h-24 mx-auto rounded-full object-cover"
+                />
+              </div>
+
+              <h2 className="text-xl font-semibold text-center mt-4">
+                {hm.userId?.username || "Unknown"}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-center">
+                {hm.location?.state}, {hm.location?.country}
               </p>
-              <Link href={`/find-housemate/browse/user/more-details/${housemate.id}`} className="block mt-4 text-center bg-blue-600 text-white py-2 rounded-lg">
+              <p className="text-gray-700 dark:text-gray-300 text-center text-sm mt-1">
+                Looking for a {hm.apartmentType || "room"} roommate.
+              </p>
+              <p className="mt-2 text-center text-blue-600 dark:text-blue-400 font-semibold">
+                Budget: {hm.currency?.toUpperCase()} {hm.budget?.toLocaleString()}
+              </p>
+
+              <Link
+                href={`/find-housemate/browse/user/more-details/${hm._id}`}
+                className="block mt-4 text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              >
                 View Profile
               </Link>
             </div>

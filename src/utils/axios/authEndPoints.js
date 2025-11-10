@@ -82,7 +82,6 @@ export async function resendOtp() {
 // Forgot Password
 export async function forgotPassword({email}) {
   try {
-    // const email = useAuthStore.getState().email;
 
     if (!email) throw new Error("No email found, Register first.");
 
