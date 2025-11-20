@@ -15,18 +15,42 @@ import {
   FaFemale,
 } from "react-icons/fa";
 import Link from "next/link";
-import { singleHouseMate } from "@/utils/axios/houseMatesEndPoints";
+import { sendRequest, singleHouseMate } from "@/utils/axios/houseMatesEndPoints";
+import useHouseStore from "@/utils/store/useHouseStore";
+import { toast } from "react-toastify";
 
 const Page = () => {
   const router = useRouter();
   const { id } = useParams();
   const [housemate, setHousemate] = useState(null);
   const [loading, setLoading] = useState(true);
+  const {error, setHouseError} = useHouseStore();
+  const {message, setHouseMessage} = useHouseStore();
+
+  
+  const posterId = housemate?.userId?._id;
+
+
+useEffect(()=>{
+    if(error){
+    toast.error(error);
+    setHouseError(null);
+  }
+}, [error])
+
+ useEffect(()=>{
+    if(message){
+    toast.success(message);
+    setHouseMessage(null);}
+  }, [message])
+
+  
+
 
   const getSingleListing = async () => {
     try {
       const res = await singleHouseMate(id);
-      console.log("single house", res);
+      console.log("single roomate", res);
       setHousemate(res);
     } catch (error) {
       console.log("Error fetching housemate details:", error);
@@ -34,6 +58,16 @@ const Page = () => {
       setLoading(false);
     }
   };
+
+  const sendRoomateRequest = async () => {
+    try {
+      const res = await sendRequest(posterId)
+    } catch (error) {
+    console.log("Error fetching housemate details:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     getSingleListing();
@@ -60,26 +94,28 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 py-12 px-6">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 relative">
 
-        {/* Back to Browse Button */}
+      <button
+        className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"
+      >
         <Link
           href="/find-housemate/browse"
-          className="bg-green-600 text-white px-4 py-2 rounded-lg absolute top-4 right-4 hover:bg-green-700 transition"
         >
           See more
         </Link>
+      </button>
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 relative">
 
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <Image
-            src={user.profilePics || "/images/default-user.png"}
+            src={user.profilePics?.url}
             alt={user.username || "User"}
             width={120}
             height={120}
             className="w-32 h-32 rounded-full object-cover"
           />
-          <div>
+          <div className="text-center md:text-start">
             <h1 className="text-2xl font-bold">{user.username || "Unknown"}</h1>
             {user.dateOfBirth && (
               <p className="text-gray-600 dark:text-gray-400">
@@ -99,41 +135,61 @@ const Page = () => {
 
         {/* Bio / Description */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold">About Me</h2>
-          <p className="text-gray-700 dark:text-gray-300 mt-2">
+          <h2 className="text-xl font-semibold text-center md:text-start">About Me</h2>
+          <p className="text-gray-700 dark:text-gray-300 mt-2 text-center md:text-start">
             Searching for a roommate interested in a {housemate.apartmentType}.
           </p>
         </div>
 
         {/* Additional Details */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <p className="flex items-center gap-2">
-            <FaUser className="text-blue-500" /> <strong>Occupation:</strong>{" "}
-            {user.occupation || "Not specified"}
-          </p>
-          <p className="flex items-center gap-2">
-            <FaHeart className="text-blue-500" /> <strong>Marital Status:</strong>{" "}
-            {user.maritalStatus || "Not specified"}
-          </p>
-          <p className="flex items-center gap-2">
-            <FaSmoking className="text-blue-500" /> <strong>Smoking:</strong>{" "}
-            {user.habit?.smoking || "Not specified"}
-          </p>
-          <p className="flex items-center gap-2">
-            <FaGlassCheers className="text-blue-500" /> <strong>Alcohol:</strong>{" "}
-            {user.habit?.alcohol || "Not specified"}
-          </p>
-          <p className="flex items-center gap-2">
-            {user.gender === "female" ? (
-              <>
-                <FaFemale className="text-pink-500" /> <strong>Gender:</strong> Female
-              </>
-            ) : (
-              <>
-                <FaMale className="text-blue-500" /> <strong>Gender:</strong> Male
-              </>
-            )}
-          </p>
+          <div className="flex items-center gap-2 flex-col md:flex-row">
+            <div className="flex  items-center gap-2">
+              <FaUser className="text-blue-500" />
+              <strong>Occupation:</strong>{" "}
+            </div>
+            <p> {user.occupation || "Not specified"}</p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-col md:flex-row">
+            <div className="flex  items-center gap-2">
+              <FaHeart className="text-blue-500" /> <strong>Marital Status:</strong>{" "}
+            </div>
+            <p>
+              {user.maritalStatus || "Not specified"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:flex flex-col gap-2">
+
+            <div className="flex items-center gap-2 flex-col md:flex-row">
+              <div className="flex items-center gap-2">
+                <FaSmoking className="text-blue-500" /> <strong>Smoking:</strong>{" "}
+              </div>
+              {user.habit?.smoking || "Not specified"}
+            </div>
+
+            <div className="flex items-center gap-2 flex-col md:flex-row">
+              <div className="flex items-center gap-2">
+                <FaGlassCheers className="text-blue-500" /> <strong>Alcohol:</strong>{" "}
+              </div>
+
+              {user.habit?.alcohol || "Not specified"}
+            </div>
+
+
+            <div className="flex items-center gap-2">
+              {user.gender === "female" ? (
+                <>
+                  <FaFemale className="text-pink-500" /> <strong>Gender:</strong> Female
+                </>
+              ) : (
+                <>
+                  <FaMale className="text-blue-500" /> <strong>Gender:</strong> Male
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Interests */}
@@ -170,8 +226,8 @@ const Page = () => {
           >
             Back to Listings
           </button>
-          <button className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-green-700 transition">
-            Show Interest
+          <button className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-green-700 transition" onClick={sendRoomateRequest}>
+            Send Request
           </button>
         </div>
       </div>

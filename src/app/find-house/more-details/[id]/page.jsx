@@ -14,12 +14,16 @@ import {
   FaRulerCombined,
   FaCalendarAlt,
   FaHeart,
+  FaEye,
 } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { singleHouse } from "@/utils/axios/houseEndPoints";
+import { showInterestInHouse, singleHouse } from "@/utils/axios/houseEndPoints";
 import useLoadingStore from "@/utils/store/useLoading";
+import useHouseStore from "@/utils/store/useHouseStore";
+import { toast } from "react-toastify";
+
 
 const FeatureItem = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-2">
@@ -32,23 +36,37 @@ const HouseDetail = () => {
   const { id } = useParams();
   const { loading, setLoading } = useLoadingStore();
 
+
   const [house, setHouse] = useState(null);
   const [engagement, setEngagement] = useState(null);
   const [interested, setInterested] = useState(false);
 
-  const handleInterestClick = () => {
-    if (!engagement) return;
+  // const handleInterestClick = () => {
+  //   if (!engagement) return;
 
-    setInterested((prev) => !prev);
+  //   setInterested((prev) => !prev);
 
-    setEngagement((prev) => ({
-      ...prev,
-      interestCount: interested
-        ? Math.max(prev.interestCount - 1, 0)
-        : prev.interestCount + 1,
-    }));
-  };
+  //   setEngagement((prev) => ({
+  //     ...prev,
+  //     interestCount: interested
+  //       ? Math.max(prev.interestCount - 1, 0)
+  //       : prev.interestCount + 1,
+  //   }));
+  // };
 
+    const {error, setHouseError} = useHouseStore();
+    const {message, setHouseMessage} = useHouseStore();
+
+    if(error) {
+       toast.error(error);
+      setHouseError(null);
+    }
+
+     if(message) {
+       toast.success(message);
+      setHouseMessage(null);
+    }
+    
   const getSingleListing = async () => {
     setLoading(true);
     try {
@@ -67,6 +85,21 @@ const HouseDetail = () => {
   useEffect(() => {
     getSingleListing();
   }, []);
+
+  const showHouseInterest = async ()=>{
+    try{
+      const res = await showInterestInHouse(id);
+      console.log("API response:", res);
+
+
+    }catch(error){
+
+    console.error("Error fetching house:", error);
+
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading || !house) {
     return (
@@ -178,9 +211,11 @@ const HouseDetail = () => {
 
       {/* Engagement Section */}
       <div className="mt-6 text-center flex flex-col justify-center items-center">
+       <div className="flex flex-col justify-center items-center">
+
         <button
-          onClick={handleInterestClick}
-          className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-semibold transition max-w-[200px] ${
+          onClick={showHouseInterest}
+          className={`w-full flex items-center justify-center gap-2 rounded-lg text-lg font-semibold transition max-w-[200px] p-2 ${
             interested
               ? "bg-red-600 text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -189,6 +224,18 @@ const HouseDetail = () => {
           <FaHeart className={interested ? "text-white" : "text-red-600"} />
           {interested ? "Interested" : "Show Interest"}
         </button>
+        
+         {/* Contact Button */}
+        <div className="mt-4">
+          <Link href={`/find-house/contact/${house._id}`}>
+            <button className="w-full flex items-center justify-center gap-2  transition bg-blue-600 text-white  rounded-lg text-lg font-semibold max-w-[200px] p-2">
+              <FaEye />
+
+              See Owner
+            </button>
+          </Link>
+        </div>
+       </div>
 
         <p className="mt-2 text-gray-400">
           {engagement?.interestCount || 0}{" "}
@@ -196,14 +243,13 @@ const HouseDetail = () => {
           interest.
         </p>
 
-        {/* Contact Button */}
-        <div className="mt-4">
-          <Link href={`/find-house/contact/${house._id}`}>
-            <button className="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold max-w-[200px] p-3">
-              See Owner
-            </button>
-          </Link>
-        </div>
+        <p className="mt-2 text-gray-400">
+          viewed by{" "}
+          {engagement?.viewCount || 0}{" "}
+          {engagement?.viewCount === 1 ? "person" : "people"}
+        </p>
+
+       
       </div>
     </MaxWidthWrapper>
   );

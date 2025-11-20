@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaMapMarkerAlt, FaMoneyBillWave, FaUser, FaBriefcase, FaHeart, FaSmoking, FaGlassCheers, FaMale, FaFemale } from "react-icons/fa";
 import Link from "next/link";
-import { singleHouseMate } from "@/utils/axios/houseMatesEndPoints";
+import { myRequest, singleHouseMate } from "@/utils/axios/houseMatesEndPoints";
 
 // Mock Data (Replace with API data)
 const housemates = [
@@ -71,7 +71,7 @@ const Page = () => {
 
   const getSingleListing = async () =>{
     try {
-      const res = await singleHouseMate();
+      const res = await myRequest();
 
       console.log("signle house",res );
       setHousematedetails(res.data);

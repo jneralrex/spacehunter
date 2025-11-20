@@ -36,7 +36,7 @@ export default function FeedGrid({ activeTab, sections }) {
                   className="cursor-pointer shadow-md rounded-2xl overflow-hidden border border-green-100 hover:shadow-lg transition-all"
                 >
                   <div className="relative w-full h-40">
-                    <Image src={section.image || "/images/user-1.png"}
+                    <Image src={section.image}
                       alt={section.title || "Listing image"}
                       fill
                       className="object-cover z-[-1]"

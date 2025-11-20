@@ -40,7 +40,7 @@ export default function HomePage() {
     id: mate._id,
     title: `${mate.user?.username || "Anonymous"} — Looking for a ${mate.apartmentType}`,
     description: `${mate.location.state}, budget ${mate.currency.toUpperCase()} ${mate.budget}`,
-    image: "",
+    image: mate.user?.profilePics?.url,
     href: `/find-housemate/browse/user/more-details/${mate._id}`,
   })),
 

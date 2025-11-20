@@ -1,3 +1,4 @@
+import useHouseStore from "../store/useHouseStore";
 import api from "./axiosInstance";
 
 export async function dashBoardListings() {
@@ -10,6 +11,8 @@ export async function dashBoardListings() {
   } catch (error) {
     console.log(error)
     console.error("fetching house failed:", error?.response?.data?.error?.message || error?.message);
+        useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+
     throw error;
   }
 }
@@ -27,6 +30,7 @@ export async function uploadRoomateRequest(formData) {
   } catch (error) {
     console.log("error", error)
     console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
     throw error;
   }
 };
@@ -42,6 +46,8 @@ export async function allHouseListings(page = 1, limit = 9) {
   } catch (error) {
     console.log(error)
     console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+        useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+
     throw error;
   }
 };
@@ -56,6 +62,24 @@ export async function singleHouse(id) {
   } catch (error) {
     console.log(error)
     console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+        useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+
     throw error;
   }
 };
+
+export async function showInterestInHouse(houseId){
+  try {
+    const { data } = await api.post(`/houseupload/${houseId}/show-interest`);
+    console.log("Interest Shown", data)
+    useHouseStore.getState().setHouseMessage(data.message)
+    return data;
+
+  } catch (error) {
+    console.log(error)
+    console.error("Showing interest failed:", error?.response?.data?.error?.message || error?.message);
+     useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+

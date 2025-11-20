@@ -14,7 +14,7 @@ export default function LeftSidebar() {
     { label: "Home", icon: <Home size={22} />, href: "/home" },
     { label: "Explore", icon: <Search size={22} />, href: "/home/explore" },
     { label: "Notifications", icon: <Bell size={22} />, href: "/home/notifications" },
-    { label: "Profile", icon: <User size={22} />, href: "/home/profile" },
+    { label: "Requests", icon: <User size={22} />, href: "/home/requests" },
     { label: "More", icon: <MoreHorizontal size={22} />, href: "/home/more" },
   ];
 

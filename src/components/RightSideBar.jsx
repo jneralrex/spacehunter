@@ -3,6 +3,7 @@
 import useAuthStore from "@/utils/store/useAuthStore";
 import { ChevronsUp, House, MailPlus, Megaphone, Printer } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function RightSideBar() {
 
@@ -15,7 +16,7 @@ export default function RightSideBar() {
           <div className="bg-white rounded-2xl shadow flex flex-col p-4">
             <div className="flex items-center gap-3 ">
               <Image
-                src={user?.profileImage}
+                src={user?.profilePics?.url} 
                 alt="User"
                 width={50}
                 height={50}
@@ -27,7 +28,9 @@ export default function RightSideBar() {
               </div>
             </div>
             <button className="mt-4 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition">
+              <Link href="/home/profile">
               Edit Profile
+              </Link>
             </button>
           </div>
 
