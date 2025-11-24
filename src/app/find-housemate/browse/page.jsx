@@ -75,7 +75,7 @@ const Page = () => {
               <div className="flex justify-center">
                 <Image
                   src={
-                    hm.userId?.profilePics ||
+                    hm.userId?.profilePics.url ||
                     "/images/default-user.png"
                   }
                   alt={hm.userId?.username || "Housemate"}
