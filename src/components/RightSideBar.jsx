@@ -4,10 +4,13 @@ import useAuthStore from "@/utils/store/useAuthStore";
 import { ChevronsUp, House, MailPlus, Megaphone, Printer } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function RightSideBar() {
 
   const {user} = useAuthStore();
+  
+
   return (
       <>
       {/* RIGHT SIDEBAR */}

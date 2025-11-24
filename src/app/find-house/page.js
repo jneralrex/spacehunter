@@ -17,7 +17,7 @@ export default function Home() {
   // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 9; // you can adjust this per page
+  const limit = 100;
 
   const getAllListings = async (currentPage = 1) => {
     try {

@@ -7,6 +7,8 @@ import RightSideBar from "@/components/RightSideBar";
 import useLoadingStore from "@/utils/store/useLoading";
 import { dashBoardListings } from "@/utils/axios/houseEndPoints";
 import useAuthStore from "@/utils/store/useAuthStore";
+import useHouseStore from "@/utils/store/useHouseStore";
+import { toast } from "react-toastify";
 
 
 export default function HomePage() {
@@ -14,8 +16,9 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("all");
   const [allListings, setAllListings] = useState([]);
   const [allHousemates, setAllHousemates] = useState([]);
-  const {loading, setLoading} = useLoadingStore();
-  
+  const { loading, setLoading } = useLoadingStore();
+
+
   const user = useAuthStore();
 
 
@@ -27,52 +30,49 @@ export default function HomePage() {
     { key: "stores", label: " Stores" },
   ];
 
- const sections = {
-  houses: allListings.map((house) => ({
-    id: house._id,
-    title: house.title,
-    description: `${house.location.streetAddress}, ${house.location.state}`,
-    image: house.images?.[0]?.url,
-    href: `/find-house/more-details/${house._id}`,
-  })),
+  const sections = {
+    houses: allListings.map((house) => ({
+      id: house._id,
+      title: house.title,
+      description: `${house.location.streetAddress}, ${house.location.state}`,
+      image: house.images?.[0]?.url,
+      href: `/find-house/more-details/${house._id}`,
+    })),
 
-  housemates: allHousemates.map((mate) => ({
-    id: mate._id,
-    title: `${mate.user?.username || "Anonymous"} — Looking for a ${mate.apartmentType}`,
-    description: `${mate.location.state}, budget ${mate.currency.toUpperCase()} ${mate.budget}`,
-    image: mate.user?.profilePics?.url,
-    href: `/find-housemate/browse/user/more-details/${mate._id}`,
-  })),
+    housemates: allHousemates.map((mate) => ({
+      id: mate._id,
+      title: `${mate.user?.username || "Anonymous"} — Looking for a ${mate.apartmentType}`,
+      description: `${mate.location.state}, budget ${mate.currency.toUpperCase()} ${mate.budget}`,
+      image: mate.user?.profilePics?.url,
+      href: `/find-housemate/browse/user/more-details/${mate._id}`,
+    })),
 
-  offices: [],
-  stores: [],
-};
-
-
+    offices: [],
+    stores: [],
+  }
 
   const getListings = async () => {
-  setLoading(true);
-  try {
-    const response = await dashBoardListings();
-    // Extract only the relevant data
-    const { houses, roommates } = response.data;
+    setLoading(true);
+    try {
+      const response = await dashBoardListings();
 
-    setAllListings(houses || []);
-    setAllHousemates(roommates || []);
-  } catch (error) {
-    console.error("all listings error", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      const { houses, roommates } = response.data;
 
+      setAllListings(houses || []);
+      setAllHousemates(roommates || []);
 
+    } catch (error) {
+      console.error("all listings error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     getListings();
   }, []);
 
-  
+
   return (
     <>
       <main className="min-h-screen text-green-700 container lg:max-w-[85%] max-w-full lg:ml-auto ">
@@ -82,9 +82,9 @@ export default function HomePage() {
             <header className="sticky top-0 bg-white/80 backdrop-blur-lg py-4 md:rounded-b-lg border-b border-green-100 z-10 overflow-x-auto overflow-y-hidden h-[60px] max-w-[800px] flex items-center lg:m-auto px-3">
               <FeedTabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
             </header>
-           <div className="">
-             <FeedGrid activeTab={activeTab} sections={sections} />
-           </div>
+            <div className="">
+              <FeedGrid activeTab={activeTab} sections={sections} />
+            </div>
           </section>
           <RightSideBar router={router} />
         </div>

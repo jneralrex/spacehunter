@@ -17,6 +17,7 @@ export default function ProfilePage() {
     fullName: "",
     username: "",
     phoneNumber: "",
+    role:"",
     countryOfResidence: "",
     bio: "",
   });
@@ -37,6 +38,7 @@ export default function ProfilePage() {
           fullName: res.user.fullName || "",
           username: res.user.username || "",
           phoneNumber: res.user.phoneNumber || "",
+          role:res.user.role,
           countryOfResidence: res.user.countryOfResidence || "",
           bio: res.user.bio || "",
         });
@@ -180,6 +182,7 @@ export default function ProfilePage() {
             <input name="fullName" value={form.fullName} onChange={handleChange} placeholder="Full name" className="w-full border rounded px-3 py-2"/>
             <input name="username" value={form.username} onChange={handleChange} placeholder="Username" className="w-full border rounded px-3 py-2"/>
             <input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} placeholder="Phone number" className="w-full border rounded px-3 py-2"/>
+            <input name="role" value={form.role} onChange={handleChange} placeholder="Role" className="w-full border rounded px-3 py-2"/>
             <input name="countryOfResidence" value={form.countryOfResidence} onChange={handleChange} placeholder="Country" className="w-full border rounded px-3 py-2"/>
             <textarea name="bio" value={form.bio} onChange={handleChange} rows={4} placeholder="Bio" className="w-full border rounded px-3 py-2"></textarea>
 

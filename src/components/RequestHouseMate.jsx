@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uploadRoomateRequest } from "@/utils/axios/houseEndPoints";
-import { set } from "react-hook-form";
 
 export default function RequestHouseMate() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +66,7 @@ export default function RequestHouseMate() {
 
   return (
     <>
-      {/* ✅ Trigger button */}
+      {/* Trigger button */}
       <button
         onClick={() => setIsOpen(true)}
         className="mt-8 bg-green-600 text-white py-3 px-4 rounded-full font-semibold transition max-w-[200px]"
@@ -75,7 +74,7 @@ export default function RequestHouseMate() {
         Request Housemate
       </button>
 
-      {/* ✅ Modal */}
+      {/* Modal */}
       <AnimatePresence>
         {isOpen && (
           <>

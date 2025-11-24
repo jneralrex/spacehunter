@@ -186,7 +186,7 @@ const HouseDetail = () => {
           Object.entries(house.otherImages).map(([category, images]) => (
             images.length > 0 && (
               <div key={category} className="mt-4">
-                <h3 className="text-lg font-medium capitalize">
+                <h3 className="text-lg font-medium capitalize text-green-500">
                   {category.replace(/([A-Z])/g, " $1")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">

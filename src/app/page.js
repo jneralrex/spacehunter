@@ -44,8 +44,8 @@ export default function Home() {
 
             {/* CTA */}
         <Roll
-          delay={200} 
-          duration={1000} 
+          delay={100} 
+          duration={500} 
           fraction={0.5}
           triggerOnce 
         >
@@ -60,7 +60,7 @@ export default function Home() {
             </p>
 
             <Zoom
-              delay={500} 
+              delay={200} 
               duration={1000} 
               fraction={1}
               triggerOnce 
@@ -83,9 +83,9 @@ export default function Home() {
 
             <JackInTheBox
                triggerOnce 
-               delay={500} 
-               duration={3500} 
-               fraction={1}
+               delay={300} 
+               duration={700} 
+               fraction={0.5}
               >
 
               <div className="p-6 bg-white/75 backdrop-blur-md border border-green-200 rounded-2xl shadow-sm">
@@ -132,12 +132,9 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <button className="bg-green-600 text-white p-3 md:px-8  md:py-3 rounded-full font-semibold hover:bg-green-700 transition">
-              List My Space
-            </button>
-            <button className="border border-green-600 text-green-700 p-3  md:px-8  md:py-3 rounded-full font-semibold hover:bg-green-50 transition">
+            <Link href='/house-upload' className="border border-green-600 text-green-700 p-3  md:px-8  md:py-3 rounded-full font-semibold hover:bg-green-50 transition">
               Learn More
-            </button>
+            </Link>
           </div>
 
           <div className="mt-10 flex justify-center">
