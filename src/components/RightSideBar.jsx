@@ -26,8 +26,7 @@ export default function RightSideBar() {
                 className="rounded-full size-[50px] object-cover"
               />
               <div>
-                <h3 className="font-semibold text-gray-950">Hi, {user?.username}</h3>
-                <p className="text-sm text-gray-500">{user?.email}</p>
+                <h3 className="font-semibold text-gray-950">{user?.username}</h3>
               </div>
             </div>
             <button className="mt-4 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition">
