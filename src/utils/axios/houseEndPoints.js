@@ -53,7 +53,6 @@ export async function listHouse(fd) {
 
 export async function editlistedHouse(fd, id) {
     useHouseStore.getState().setHouseError(null);
-alert(id)
   try {
     const { data } = await api.patch(
       `/houseupload/house/${id}`,
@@ -82,25 +81,6 @@ alert(id)
     throw error;
   }
 }
-
-export async function uploadRoomateRequest(formData) {
-  useHouseStore.getState().setHouseError(null);
-  try {
-    alert("Fired")
-    const { data } = await api.post("/housemate/search", formData);
-    console.log(formData)
-    if (data.status) {
-      alert("good");
-    }
-    console.log(data)
-    return data;
-  } catch (error) {
-    console.log("error", error)
-    console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
-    useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
-    throw error;
-  }
-};
 
 export async function allHouseListings(page = 1, limit = 100) {
     useHouseStore.getState().setHouseError(null);

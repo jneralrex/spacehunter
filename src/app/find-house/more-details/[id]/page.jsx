@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   FaToilet,
   FaUtensils,
@@ -16,7 +17,7 @@ import {
   FaHeart,
   FaEye,
 } from "react-icons/fa";
-import { FaLocationDot } from "react-icons/fa6";
+import { FaBookmark, FaLocationDot } from "react-icons/fa6";
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { showInterestInHouse, singleHouse } from "@/utils/axios/houseEndPoints";
@@ -24,11 +25,14 @@ import useLoadingStore from "@/utils/store/useLoading";
 import useHouseStore from "@/utils/store/useHouseStore";
 import { toast } from "react-toastify";
 
+import useAuthStore from "@/utils/store/useAuthStore";
 
 const FeatureItem = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-2">
     <Icon className="text-gray-600" size={20} />
-    <span>{value} {label}</span>
+    <span>
+      {value} {label}
+    </span>
   </div>
 );
 
@@ -36,70 +40,80 @@ const HouseDetail = () => {
   const { id } = useParams();
   const { loading, setLoading } = useLoadingStore();
 
-
   const [house, setHouse] = useState(null);
   const [engagement, setEngagement] = useState(null);
+
   const [interested, setInterested] = useState(false);
 
-  // const handleInterestClick = () => {
-  //   if (!engagement) return;
+  // Get logged in user
+  const { user } = useAuthStore();
 
-  //   setInterested((prev) => !prev);
+  console.log("user", user)
 
-  //   setEngagement((prev) => ({
-  //     ...prev,
-  //     interestCount: interested
-  //       ? Math.max(prev.interestCount - 1, 0)
-  //       : prev.interestCount + 1,
-  //   }));
-  // };
+  const { error, setHouseError } = useHouseStore();
+  const { message, setHouseMessage } = useHouseStore();
 
-    const {error, setHouseError} = useHouseStore();
-    const {message, setHouseMessage} = useHouseStore();
+  if (error) {
+    toast.error(error);
+    setHouseError(null);
+  }
 
-    if(error) {
-       toast.error(error);
-      setHouseError(null);
-    }
+  if (message) {
+    toast.success(message);
+    setHouseMessage(null);
+  }
 
-     if(message) {
-       toast.success(message);
-      setHouseMessage(null);
-    }
-    
-  const getSingleListing = async () => {
-    setLoading(true);
-    try {
-      const res = await singleHouse(id);
-      console.log("API response:", res);
+  // Fetch house
+ const getSingleListing = async () => {
+  setLoading(true);
+  try {
+    const res = await singleHouse(id);
 
-      setHouse(res.data);
-      setEngagement(res?.engagement);
-    } catch (error) {
-      console.error("Error fetching house:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setHouse(res.data);
+    setEngagement(res.engagement);
+
+    // Set interest state based on user ID
+   const userId = user?._id || user?.id;
+setInterested(
+  res.engagement?.interestedUsers?.some((u) => u._id.toString() === userId.toString())
+);
+
+
+  } catch (error) {
+    console.error("Error fetching house:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     getSingleListing();
   }, []);
 
-  const showHouseInterest = async ()=>{
-    try{
-      const res = await showInterestInHouse(id);
-      console.log("API response:", res);
+  // ---- HANDLE INTEREST TOGGLE ----
+const toggleInterest = async () => {
+  setLoading(true);
+  try {
+    const res = await showInterestInHouse(id);
+    if (!res.engagement) return;
 
+    setEngagement(res.engagement);
 
-    }catch(error){
-
-    console.error("Error fetching house:", error);
-
-    } finally {
-      setLoading(false);
-    }
+    const userId = user?._id || user?.id;
+    setInterested(
+      res.engagement.interestedUsers.some(
+        (u) => u._id.toString() === userId.toString()
+      )
+    );
+  } catch (error) {
+    console.error("Error updating interest:", error);
+    toast.error("Failed to update interest.");
+  } finally {
+    setLoading(false);
   }
+};
+
+
 
   if (loading || !house) {
     return (
@@ -116,6 +130,7 @@ const HouseDetail = () => {
         <Link href="/find-house">See more</Link>
       </button>
 
+      {/* MAIN IMAGE */}
       <div className="relative w-full h-[400px] rounded-lg overflow-hidden bg-gray-200 mt-3 md:mt-0">
         {house?.images?.length > 0 && (
           <Image
@@ -133,14 +148,17 @@ const HouseDetail = () => {
         <p className="text-xl text-gray-400 font-semibold">
           {house.currency?.toUpperCase()} {house.price}
         </p>
+
         <p className="text-gray-400">
-          <span><FaLocationDot size={20}/></span>
-         {house.location?.streetAddress}, {house.location?.lgaOrCountyOrDistrict},{" "}
+          <span>
+            <FaLocationDot size={20} />
+          </span>
+          {house.location?.streetAddress}, {house.location?.lgaOrCountyOrDistrict},{" "}
           {house.location?.state}, {house.location?.country}
         </p>
       </div>
 
-      {/* House Features */}
+      {/* Features */}
       <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-6 text-gray-400 text-lg">
         <FeatureItem icon={FaBed} label="Bedrooms" value={house.bedrooms} />
         <FeatureItem icon={FaCouch} label="Living Rooms" value={house.livingRooms} />
@@ -157,11 +175,13 @@ const HouseDetail = () => {
       </div>
 
       {/* Description */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 text-green-500 mt-4">Description</h2>
-         <p className=" text-gray-400 leading-relaxed">{house.description}</p>
+      <div>
+        <h2 className="text-2xl font-semibold mb-2 text-green-500 mt-4">
+          Description
+        </h2>
+        <p className="text-gray-400 leading-relaxed">{house.description}</p>
+      </div>
 
-        </div>
       {/* Amenities */}
       {house.amenities && (
         <div className="mt-6">
@@ -182,13 +202,15 @@ const HouseDetail = () => {
       {/* Gallery */}
       <div className="mt-8">
         <h2 className="text-2xl font-semibold text-green-500">Gallery</h2>
+
         {house?.otherImages &&
-          Object.entries(house.otherImages).map(([category, images]) => (
-            images.length > 0 && (
+          Object.entries(house.otherImages).map(([category, images]) =>
+            images.length > 0 ? (
               <div key={category} className="mt-4">
                 <h3 className="text-lg font-medium capitalize text-green-500">
                   {category.replace(/([A-Z])/g, " $1")}
                 </h3>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                   {images.map((img, index) => (
                     <div
@@ -205,37 +227,33 @@ const HouseDetail = () => {
                   ))}
                 </div>
               </div>
-            )
-          ))}
+            ) : null
+          )}
       </div>
 
-      {/* Engagement Section */}
+      {/* Engagement */}
       <div className="mt-6 text-center flex flex-col justify-center items-center">
-       <div className="flex flex-col justify-center items-center">
-
+        {/* INTEREST BUTTON */}
         <button
-          onClick={showHouseInterest}
-          className={`w-full flex items-center justify-center gap-2 rounded-lg text-lg font-semibold transition max-w-[200px] p-2 ${
-            interested
-              ? "bg-red-600 text-white"
+          onClick={toggleInterest}
+          className={`w-full flex items-center justify-center gap-2 rounded-lg text-lg font-semibold transition max-w-[200px] p-2 ${interested
+              ? "bg-red-600/90 text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
+            }`}
         >
-          <FaHeart className={interested ? "text-white" : "text-red-600"} />
-          {interested ? "Interested" : "Show Interest"}
+          <FaBookmark className={interested ? "text-black" : "text-grey-600"} />
+          {interested ? "Remove Interest" : "Show Interest"}
         </button>
-        
-         {/* Contact Button */}
+
+        {/* Contact Button */}
         <div className="mt-4">
           <Link href={`/find-house/contact/${house._id}`}>
-            <button className="w-full flex items-center justify-center gap-2  transition bg-blue-600 text-white  rounded-lg text-lg font-semibold max-w-[200px] p-2">
+            <button className="w-full flex items-center justify-center gap-2 transition bg-blue-600 text-white rounded-lg text-lg font-semibold max-w-[200px] p-2">
               <FaEye />
-
               See Owner
             </button>
           </Link>
         </div>
-       </div>
 
         <p className="mt-2 text-gray-400">
           {engagement?.interestCount || 0}{" "}
@@ -244,12 +262,9 @@ const HouseDetail = () => {
         </p>
 
         <p className="mt-2 text-gray-400">
-          viewed by{" "}
-          {engagement?.viewCount || 0}{" "}
+          viewed by {engagement?.viewCount || 0}{" "}
           {engagement?.viewCount === 1 ? "person" : "people"}
         </p>
-
-       
       </div>
     </MaxWidthWrapper>
   );

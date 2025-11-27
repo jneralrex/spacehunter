@@ -1,6 +1,7 @@
 'use client'
 import LeftSidebar from "@/components/LeftSideBar";
 import MaxWidthWrapperSecond from "@/components/MaxWidthWrapperSecond";
+import NotificationLoader from "@/utils/loader/NotificationLoader";
 import { useState } from "react";
 
 export default function HomeLayOut({ children }) {
@@ -17,6 +18,7 @@ export default function HomeLayOut({ children }) {
     return (
         <MaxWidthWrapperSecond>
             <div className="">
+                <NotificationLoader/>
                 <LeftSidebar tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
                
                 <main className="flex-1">{children}</main>

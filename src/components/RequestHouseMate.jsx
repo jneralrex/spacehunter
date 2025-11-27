@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { uploadRoomateRequest } from "@/utils/axios/houseEndPoints";
+import { allMyRoomateSearchPosts, uploadRoomateRequest } from "@/utils/axios/houseMatesEndPoints";
 
 export default function RequestHouseMate() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,11 +18,10 @@ export default function RequestHouseMate() {
     targetPrice: "",
   });
 
-  // Prevent background scroll & disable interactions
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"; // stop scroll
-      document.body.style.pointerEvents = "none"; // disable all clicks behind
+      document.body.style.overflow = "hidden"; 
+      document.body.style.pointerEvents = "none"; 
     } else {
       document.body.style.overflow = "";
       document.body.style.pointerEvents = "";
@@ -34,7 +33,6 @@ export default function RequestHouseMate() {
     };
   }, [isOpen]);
 
-  // handle field change
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -63,6 +61,23 @@ export default function RequestHouseMate() {
 
     setIsOpen(false);
   };
+
+  const getMyHousemateSearchePosts = async() => {
+    try {
+      const res = await allMyRoomateSearchPosts();
+
+      console.log("my searches",res)
+      
+    } catch (error) {
+      console.error(error)
+    }
+  };
+
+  useEffect(() => {
+    getMyHousemateSearchePosts();
+  }, []);
+
+
 
   return (
     <>

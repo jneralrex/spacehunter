@@ -73,7 +73,6 @@ export async function toggleRequest(id, status) {
   }
 }
 
-
 export async function myRequest() {
     try {
         const { data } = await api.get(`/housemate/request/sent-by-me`)
@@ -82,6 +81,38 @@ export async function myRequest() {
     } catch (error) {
         console.log(error)
         console.error("Single housemate request failed:", error?.response?.data?.error?.message || error?.message);
+        throw error;
+    }
+};
+
+export async function uploadRoomateRequest(formData) {
+  useHouseStore.getState().setHouseError(null);
+  try {
+    alert("Fired")
+    const { data } = await api.post("/housemate/search", formData);
+    console.log(formData)
+    if (data.status) {
+      alert("good");
+    }
+    console.log(data)
+    return data;
+  } catch (error) {
+    console.log("error", error)
+    console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+
+export async function allMyRoomateSearchPosts() {
+    alert("Fired")
+    try {
+        const { data } = await api.get(`/housemate/search/my-search`)
+        console.log("my posts", data);
+        return data.request;
+    } catch (error) {
+        console.log("my posts", error)
+        console.error("Getting my roommate posts failed:", error?.response?.data?.error?.message || error?.message);
         throw error;
     }
 };
