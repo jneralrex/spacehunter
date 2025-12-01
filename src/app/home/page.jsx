@@ -82,7 +82,7 @@ export default function HomePage() {
             <header className="sticky top-0 bg-white/80 backdrop-blur-lg py-4 md:rounded-b-lg border-b border-green-100 z-10 overflow-x-auto overflow-y-hidden h-[60px] max-w-[800px] flex items-center lg:m-auto px-3">
               <FeedTabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
             </header>
-            <div className="">
+            <div className="pb-10 lg:pl-3 xl:pl-0 ">
               <FeedGrid activeTab={activeTab} sections={sections} />
             </div>
           </section>

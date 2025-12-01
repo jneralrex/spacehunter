@@ -3,6 +3,7 @@ import "./globals.css";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import Head from "next/head";
 import ToastProvider from "@/components/ToastProvider";
+import MainLayout from "@/components/MainLayout"; // Import MainLayout
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,7 +78,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#000000]`}
       >
         <LoadingOverlay/>
-        {children}
+        <MainLayout>{children}</MainLayout>
         <ToastProvider />
 
       </body>

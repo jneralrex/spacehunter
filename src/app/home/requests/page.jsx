@@ -5,6 +5,7 @@ import useHouseStore from "@/utils/store/useHouseStore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function Requests() {
   const [activeTab, setActiveTab] = useState("received");
@@ -12,6 +13,7 @@ export default function Requests() {
   const [sentRequests, setSentRequests] = useState([]);
 
   const { error, setHouseError, message, setHouseMessage } = useHouseStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (error) {
@@ -54,6 +56,9 @@ export default function Requests() {
       const res = await toggleRequest(id, newStatus);
       toast.success(res.message || `Request marked ${newStatus}`);
       fetchReceived();
+      if (newStatus === "accepted" && res.chatId) {
+        router.push(`/home/chat/${res.chatId}`);
+      }
     } catch (error) {
       console.error(error);
     }

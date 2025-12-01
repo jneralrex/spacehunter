@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams} from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -48,8 +48,6 @@ const HouseDetail = () => {
   // Get logged in user
   const { user } = useAuthStore();
 
-  console.log("user", user)
-
   const { error, setHouseError } = useHouseStore();
   const { message, setHouseMessage } = useHouseStore();
 
@@ -64,56 +62,52 @@ const HouseDetail = () => {
   }
 
   // Fetch house
- const getSingleListing = async () => {
-  setLoading(true);
-  try {
-    const res = await singleHouse(id);
+  const getSingleListing = async () => {
+    setLoading(true);
+    try {
+      const res = await singleHouse(id);
 
-    setHouse(res.data);
-    setEngagement(res.engagement);
+      setHouse(res.data);
+      setEngagement(res.engagement);
 
-    // Set interest state based on user ID
-   const userId = user?._id || user?.id;
-setInterested(
-  res.engagement?.interestedUsers?.some((u) => u._id.toString() === userId.toString())
-);
+      const userId = user?.id;
+      const interestedList = res.engagement?.interestedUsers || [];
 
+      setInterested(interestedList.some((u) => u._id === userId));
 
-  } catch (error) {
-    console.error("Error fetching house:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    } catch (error) {
+      console.error("Error fetching house:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    if (!user?._id) return;
     getSingleListing();
-  }, []);
+  }, [user]);
+
 
   // ---- HANDLE INTEREST TOGGLE ----
-const toggleInterest = async () => {
-  setLoading(true);
-  try {
-    const res = await showInterestInHouse(id);
-    if (!res.engagement) return;
+  const toggleInterest = async () => {
+    setLoading(true);
+    try {
+      const res = await showInterestInHouse(id);
 
-    setEngagement(res.engagement);
+      setEngagement(res.engagement);
 
-    const userId = user?._id || user?.id;
-    setInterested(
-      res.engagement.interestedUsers.some(
-        (u) => u._id.toString() === userId.toString()
-      )
-    );
-  } catch (error) {
-    console.error("Error updating interest:", error);
-    toast.error("Failed to update interest.");
-  } finally {
-    setLoading(false);
-  }
-};
+      const userId = user?.id;
+      const interestedList = res.engagement.interestedUsers || [];
+
+      setInterested(interestedList.some((u) => u._id === userId));
 
 
+    } catch (error) {
+      console.error("Error updating interest:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading || !house) {
     return (
@@ -237,12 +231,12 @@ const toggleInterest = async () => {
         <button
           onClick={toggleInterest}
           className={`w-full flex items-center justify-center gap-2 rounded-lg text-lg font-semibold transition max-w-[200px] p-2 ${interested
-              ? "bg-red-600/90 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-red-600/90 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
         >
           <FaBookmark className={interested ? "text-black" : "text-grey-600"} />
-          {interested ? "Remove Interest" : "Show Interest"}
+          {interested ? "Remove from Bookmark" : "Bookmark Interest"}
         </button>
 
         {/* Contact Button */}

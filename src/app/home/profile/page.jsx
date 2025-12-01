@@ -115,7 +115,7 @@ export default function ProfilePage() {
   if (loading) return <p>Loading profile…</p>;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="min-h-screen text-white container lg:max-w-[80%] xl:max-w-[85%] max-w-full lg:ml-auto">
       <h1 className="text-2xl font-semibold mb-6">Edit Profile</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,0 +1,510 @@
+const mongoose = require("mongoose");
+
+const chatSchema = new mongoose.Schema({
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }],
+  lastMessage: { type: String, },
+  typing: {
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  isTyping: { type: Boolean, default: false },
+},
+
+}, { timestamps: true });
+
+chatSchema.index({ members: 1 });
+
+module.exports = mongoose.model("Chat", chatSchema);
+
+const mongoose = require("mongoose");
+
+const messageSchema = new mongoose.Schema({
+  chatId: { type: mongoose.Schema.Types.ObjectId, ref: "Chat", required: true },
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  text: { type: String, required: true, trim: true },
+  isRead: { type: Boolean, default: false },
+  seenBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+}, { timestamps: true });
+
+module.exports = mongoose.model("Message", messageSchema);
+
+
+const Chat = require("../../models/chat/chat.model");
+const Message = require("../../models/chat/message.model");
+const CustomError = require("../../utils/errors/customError");
+
+// Get all chats for the logged-in user
+const getUserChats = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const chats = await Chat.find({ members: userId })
+      .populate("members", "username profilePics email")
+      .sort({ updatedAt: -1 });
+    res.json({ success: true, chats });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get messages for a chat and mark them as read
+const getChatMessages = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const { chatId } = req.params;
+
+    const chat = await Chat.findById(chatId);
+    if (!chat) throw new CustomError(404, "Chat not found");
+
+    // check if user belongs to this chat
+    if (!chat.members.map(String).includes(userId.toString())) {
+      throw new CustomError(403, "Not allowed to view this chat");
+    }
+
+    // mark all messages not sent by this user as read
+    await Message.updateMany(
+      { chatId, receiverId: userId, isRead: false },
+      { $set: { isRead: true }, $addToSet: { seenBy: userId } }
+    );
+
+    // get updated messages after marking as read
+    const messages = await Message.find({ chatId })
+      .populate("senderId", "username profilePics")
+      .sort({ createdAt: 1 });
+
+    res.json({ success: true, messages });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  getUserChats,
+  getChatMessages,
+};
+
+
+const express = require("express");
+const authenticate = require("../../utils/access/authenticate");
+const { getUserChats, getChatMessages } = require("../../controllers/chat/chat.controller");
+const router = express.Router();
+
+router.get("/my-chats", authenticate, getUserChats);
+router.get("/:chatId/messages", authenticate, getChatMessages);
+
+module.exports = router;
+
+
+// socket/index.js
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const { config } = require("../config/config");
+const { isAllowedToChat, getUserIdFromSocket } = require("./utils.socket");
+const Chat = require("../models/chat/chat.model");
+const Message = require("../models/chat/message.model");
+const DOMPurify = require("isomorphic-dompurify");
+const { RateLimiterMemory } = require("rate-limiter-flexible");
+
+console.log("Socket file loaded...");
+
+
+module.exports = (server) => {
+  const io = new Server(server, {
+    cors: {
+      origin: ["https://spacehunter-production.up.railway.app", "https://spaceehunters.vercel.app", "http://localhost:3000", "http://localhost:3001", "http://localhost:5173"],
+      methods: ["GET", "POST"]
+    }
+  });
+
+  const onlineUsers = new Map();
+
+  const rateLimiter = new RateLimiterMemory({
+    points: 10, // 10 points
+    duration: 1, // per second
+  });
+
+  io.use(async (socket, next) => {
+    const userId = getUserIdFromSocket(socket);
+    if (!userId) {
+      // Not authenticated, rate limit by IP
+      try {
+        await rateLimiter.consume(socket.handshake.address);
+        return next();
+      } catch (err) {
+        return next(new Error("Too many requests"));
+      }
+    }
+
+    // Authenticated user, rate limit by userId
+    try {
+      await rateLimiter.consume(userId.toString());
+      next();
+    } catch (err) {
+      next(new Error("Too many requests"));
+    }
+  });
+
+
+io.engine.on("connection_error", (err) => {
+  console.error("Connection error:", err.code, err.message);
+});
+
+
+  io.on("connection", (socket) => {
+    console.log("Socket connected:", socket.id);
+    console.log("Socket.IO initialized and listening...");
+
+
+    const userId = getUserIdFromSocket(socket);
+    if (!userId) {
+      socket.emit("error", { message: "Authentication failed" });
+      socket.disconnect(true);
+      return;
+    }
+
+    onlineUsers.set(userId.toString(), socket.id);
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+
+    socket.on("joinChat", async ({ chatId, otherUserId }) => {
+        console.log("joinChat event triggered:", { chatId, otherUserId, userId });
+
+      try {
+        const chat = await Chat.findById(chatId);
+        if (!chat || !chat.members.map(String).includes(userId.toString())) {
+            console.log("Invalid chat or membership");
+
+          return socket.emit("joinError", { message: "Invalid chat or membership" });
+        }
+
+        const allowed = await isAllowedToChat(userId, otherUserId);
+        if (!allowed) {
+          console.log("User not allowed to join this chat");
+          return socket.emit("joinError", { message: "You are not allowed to join this chat" });
+        }
+          console.log("Joining chat room:", chatId);
+
+        socket.join(chatId);
+        socket.emit("joined", { chatId });
+      } catch (err) {
+        console.error("joinChat error:", err.message);
+
+        socket.emit("joinError", { message: err.message });
+      }
+    });
+
+    socket.on("sendMessage", async ({ chatId, text, receiverId }) => {
+      try {
+        if (!text || !chatId) return;
+
+        const allowed = await isAllowedToChat(userId, receiverId);
+        if (!allowed) {
+          console.log("User not allowed to join this chat");
+
+          return socket.emit("sendError", { message: "You are not allowed to message this user." });
+        }
+
+        const sanitizedText = DOMPurify.sanitize(text);
+
+        const message = await Message.create({
+          chatId,
+          senderId: userId,
+          receiverId,
+          text: sanitizedText,
+          isRead: false
+        });
+
+        await Chat.findByIdAndUpdate(chatId, { lastMessage: sanitizedText, updatedAt: new Date() });
+
+        const receiverSocketId = onlineUsers.get(receiverId.toString());
+        const payload = {
+          _id: message._id,
+          chatId,
+          senderId: userId,
+          receiverId,
+          text: sanitizedText,
+          createdAt: message.createdAt
+        };
+
+        io.to(chatId).emit("newMessage", payload);
+        console.log("chat returned", payload)
+
+        if (receiverSocketId && !io.sockets.sockets.get(receiverSocketId)?.rooms?.has(chatId)) {
+          io.to(receiverSocketId).emit("newMessage", payload);
+        }
+
+      } catch (err) {
+        socket.emit("sendError", { message: err.message });
+      }
+    });
+
+    socket.on("markRead", async ({ chatId }) => {
+      try {
+        const messages = await Message.find({ chatId, receiverId: userId, isRead: false });
+
+        for (const msg of messages) {
+          if (!msg.seenBy.includes(userId)) msg.seenBy.push(userId);
+          msg.isRead = true;
+          await msg.save();
+        }
+
+        io.to(chatId).emit("messagesRead", { chatId, userId });
+      } catch (err) {
+        socket.emit("readError", { message: err.message });
+      }
+    });
+
+    socket.on("chatOpened", async ({ chatId }) => {
+      await Message.updateMany({ chatId, receiverId: userId, isRead: false }, { isRead: true });
+      io.to(chatId).emit("messagesRead", { chatId, userId });
+    });
+
+
+
+    socket.on("typing", async ({ chatId }) => {
+      await Chat.findByIdAndUpdate(chatId, {
+        typing: { sender: userId, isTyping: true },
+      });
+
+      io.to(chatId).emit("userTyping", { chatId, userId, isTyping: true });
+    });
+
+    socket.on("stopTyping", async ({ chatId }) => {
+      await Chat.findByIdAndUpdate(chatId, {
+        typing: { sender: userId, isTyping: false },
+      });
+
+      io.to(chatId).emit("userTyping", { chatId, userId, isTyping: false });
+    });
+
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected:", socket.id);
+      for (const [uid, sid] of onlineUsers.entries()) {
+        if (sid === socket.id) onlineUsers.delete(uid);
+      }
+      io.emit("onlineUsers", Array.from(onlineUsers.keys()));
+    });
+  });
+
+  return io;
+};
+
+
+// socket/utils.js
+const jwt = require("jsonwebtoken");
+const { config } = require("../config/config");
+const Partnership = require("../models/housemate/housemate.partnershipRequest.model");
+const House = require("../models/house/house.model");
+
+exports.isAllowedToChat = async (userA, userB) => {
+  // 1. Check for an accepted partnership
+  const partnership = await Partnership.findOne({
+    $or: [
+      { requesterId: userA, posterId: userB },
+      { requesterId: userB, posterId: userA },
+    ],
+    status: "accepted",
+  });
+  if (partnership) return true;
+
+  // 2. Check if one user is the owner of a house the other has shown interest in
+  const houseInterest = await House.findOne({
+    $or: [
+      { userId: userA, interests: userB },
+      { userId: userB, interests: userA },
+    ],
+  });
+  if (houseInterest) return true;
+
+  return false;
+};
+
+exports.getUserIdFromSocket = (socket) => {
+  try {
+    const authHeader =
+      socket.handshake.auth?.token ||
+      socket.handshake.query?.token ||
+      socket.handshake.headers?.authorization;
+
+    console.log("Auth Header Received:", authHeader);
+
+    if (!authHeader) return null;
+
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
+    const decoded = jwt.verify(token, config.jwt_secret);
+    console.log(" Decoded User ID:", decoded.id);
+
+    return decoded.id;
+  } catch (err) {
+    console.error(" Socket auth error:", err.message);
+    return null;
+  }
+};
+
+
+
+response from console
+Joining chat room: 68e535aa6020f6f2eebe9b4e
+chat returned {
+  _id: new ObjectId('692aa893037366dc4715c117'),
+  chatId: '68e535aa6020f6f2eebe9b4e',
+  senderId: '68e50a47f4807d267cee57ea',
+  receiverId: '68e5087bf4807d267cee57d8',
+  text: 'hi',
+  createdAt: 2025-11-29T08:02:27.757Z
+}
+Socket disconnected: zQGfy8BI6c2kOkd_AAAl
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwYTQ3ZjQ4MDdkMjY3Y2VlNTdlYSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzY0NDAzMzAzLCJleHAiOjE3NjQ0MDQyMDN9.2VfREmMp8VuQ4oG-eigGUw1PuVK4mtrp1YMPj8qqhb8
+ Decoded User ID: 68e50a47f4807d267cee57ea
+Socket connected: A8xEd0qil14pV8PFAAAo
+Socket.IO initialized and listening...
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwYTQ3ZjQ4MDdkMjY3Y2VlNTdlYSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzY0NDAzMzAzLCJleHAiOjE3NjQ0MDQyMDN9.2VfREmMp8VuQ4oG-eigGUw1PuVK4mtrp1YMPj8qqhb8
+ Decoded User ID: 68e50a47f4807d267cee57ea
+Socket disconnected: A8xEd0qil14pV8PFAAAo
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+Socket connected: XJQ-H41o_RwpVrC7AAAr
+Socket.IO initialized and listening...
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+Socket disconnected: XJQ-H41o_RwpVrC7AAAr
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+Socket connected: spwELj1Jh20RHj2lAAAt
+Socket.IO initialized and listening...
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+joinChat event triggered: {
+  chatId: '68e535aa6020f6f2eebe9b4e',
+  otherUserId: '68e5087bf4807d267cee57d8',
+  userId: '68e5087bf4807d267cee57d8'
+}
+User not allowed to join this chat
+Socket disconnected: spwELj1Jh20RHj2lAAAt
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+Socket connected: 6rLiURNY1-ghsBnzAAAv
+Socket.IO initialized and listening...
+Auth Header Received: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZTUwODdiZjQ4MDdkMjY3Y2VlNTdkOCIsImlhdCI6MTc2NDQwMzQwNSwiZXhwIjoxNzY0NDA0MzA1fQ.RQDXTRoPhWSumPdkaBFEj13fJZxi9EpwJyr54T9q--I
+ Decoded User ID: 68e5087bf4807d267cee57d8
+joinChat event triggered: {
+  chatId: '68e535aa6020f6f2eebe9b4e',
+  otherUserId: '68e5087bf4807d267cee57d8',
+  userId: '68e5087bf4807d267cee57d8'
+}
+User not allowed to join this chat
+
+
+current chat 
+{_id: '68e535aa6020f6f2eebe9b4e', members: Array(2), lastMessage: 'hello', createdAt: '2025-10-07T15:45:46.480Z', updatedAt: '2025-11-29T08:28:07.448Z', …}
+createdAt
+: 
+"2025-10-07T15:45:46.480Z"
+lastMessage
+: 
+"hello"
+members
+: 
+Array(2)
+0
+: 
+email
+: 
+"idahrex@gmail.com"
+profilePics
+: 
+public_id
+: 
+"profile_picture/f9jeo9ujilblzkpnqvev"
+url
+: 
+"https://res.cloudinary.com/dhn2wyuuj/image/upload/v1763740564/profile_picture/f9jeo9ujilblzkpnqvev.webp"
+[[Prototype]]
+: 
+Object
+username
+: 
+"Mensa"
+_id
+: 
+"68e5087bf4807d267cee57d8"
+[[Prototype]]
+: 
+Object
+1
+: 
+email
+: 
+"idahabubakar49@gmail.com"
+profilePics
+: 
+public_id
+: 
+"profile_picture/myjsqykzqdp4tvybvvk0"
+url
+: 
+"https://res.cloudinary.com/dhn2wyuuj/image/upload/v1763633327/profile_picture/myjsqykzqdp4tvybvvk0.webp"
+[[Prototype]]
+: 
+Object
+username
+: 
+"Rex"
+_id
+: 
+"68e50a47f4807d267cee57ea"
+[[Prototype]]
+: 
+Object
+length
+: 
+2
+[[Prototype]]
+: 
+Array(0)
+otherMember
+: 
+email
+: 
+"idahrex@gmail.com"
+profilePics
+: 
+public_id
+: 
+"profile_picture/f9jeo9ujilblzkpnqvev"
+url
+: 
+"https://res.cloudinary.com/dhn2wyuuj/image/upload/v1763740564/profile_picture/f9jeo9ujilblzkpnqvev.webp"
+[[Prototype]]
+: 
+Object
+username
+: 
+"Mensa"
+_id
+: 
+"68e5087bf4807d267cee57d8"
+[[Prototype]]
+: 
+Object
+updatedAt
+: 
+"2025-11-29T08:28:07.448Z"
+__v
+: 
+0
+_id
+: 
+"68e535aa6020f6f2eebe9b4e"
+[[Prototype]]
+: 
+Object
+
+
+
+when I send a chat, they align on the left until i refresh before they take their respective postion and I dont like that 
+
+
+
+can we change the way the chat list and [chatid] page works? I want it to be like twitter where the component is by the right if the screen and isnt so big and it pops out from the botton. so instead of it being a page we make it a component

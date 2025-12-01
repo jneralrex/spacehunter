@@ -153,3 +153,16 @@ export async function showInterestInHouse(houseId){
   }
 };
 
+export  async function getMyBookmarks(){
+    useHouseStore.getState().setHouseError(null);
+  try {
+    const { data } = await api.get(`/houseupload/my-bookmarks`);
+    console.log("Bookmarks", data)
+    return data;
+  } catch (error) {
+    console.log(error)
+    console.error("Fetching bookmarks failed:", error?.response?.data?.error?.message || error?.message);
+        useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};

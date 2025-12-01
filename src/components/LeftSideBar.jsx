@@ -38,7 +38,6 @@ export default function LeftSidebar() {
   ];
 
   const drawerItems = [
-    { label: "Messages", icon: <MessageSquare size={18} />, href: "/home/messages" },
     { label: "Manage Listings", icon: <House size={18} />, href: "/home/listing-management" },
     user?.role === "user" ? { label: "Manage Search", icon: <House size={18} />, href: "/home/housemate-search-management" } : { label: "Ads", icon: <DollarSign size={18} />, href: "/home/ads" },
     { label: "Bookmarks", icon: <Bookmark size={18} />, href: "/home/bookmarks" },
