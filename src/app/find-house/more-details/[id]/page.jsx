@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,12 +20,15 @@ import {
 import { FaBookmark, FaLocationDot } from "react-icons/fa6";
 
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
-import { showInterestInHouse, singleHouse } from "@/utils/axios/houseEndPoints";
+// import { showInterestInHouse, singleHouse } from "@/utils/axios/houseEndPoints";
 import useLoadingStore from "@/utils/store/useLoading";
 import useHouseStore from "@/utils/store/useHouseStore";
 import { toast } from "react-toastify";
 
 import useAuthStore from "@/utils/store/useAuthStore";
+import { showInterestInHouse, singleHouse } from "@/utils/axios/houseEndPoints";
+import ReportModal from "@/components/ReportModal";
+import { FaFlag } from "react-icons/fa";
 
 const FeatureItem = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-2">
@@ -44,6 +47,7 @@ const HouseDetail = () => {
   const [engagement, setEngagement] = useState(null);
 
   const [interested, setInterested] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Get logged in user
   const { user } = useAuthStore();
@@ -83,7 +87,7 @@ const HouseDetail = () => {
   };
 
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?.id) return;
     getSingleListing();
   }, [user]);
 
@@ -120,21 +124,39 @@ const HouseDetail = () => {
   return (
     <MaxWidthWrapper className="py-10">
       {/* Hero Image */}
-      <button className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]">
+      <button className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-9/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]">
         <Link href="/find-house">See more</Link>
       </button>
 
       {/* MAIN IMAGE */}
+
       <div className="relative w-full h-[400px] rounded-lg overflow-hidden bg-gray-200 mt-3 md:mt-0">
+        {/* Background image: hidden by default, block only on lg+ screens */}
+        <div
+          className="absolute inset-0  block"
+          style={{
+            backgroundImage: `url(${house.images[0].url || house.images[0]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+
+        {/* Blurred overlay: hidden by default, block only on lg+ screens */}
+        <div className="absolute inset-0 backdrop-blur-md block"></div>
+
+        {/* Original Foreground Image: remains visible on all screen sizes */}
         {house?.images?.length > 0 && (
           <Image
             src={house.images[0].url || house.images[0]}
             alt={house.title}
             fill
-            className="object-cover"
+            className="object-contain relative z-10"
           />
         )}
       </div>
+
+
+
 
       {/* House Info */}
       <div className="mt-6 flex flex-col gap-2">
@@ -259,6 +281,22 @@ const HouseDetail = () => {
           viewed by {engagement?.viewCount || 0}{" "}
           {engagement?.viewCount === 1 ? "person" : "people"}
         </p>
+
+        {/* Report Button */}
+        <button
+          onClick={() => setIsReportModalOpen(true)}
+          className="mt-6 flex items-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium transition cursor-pointer"
+        >
+          <FaFlag size={14} />
+          Report this house
+        </button>
+
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetModel="House"
+          targetId={id}
+        />
       </div>
     </MaxWidthWrapper>
   );

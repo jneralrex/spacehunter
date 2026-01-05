@@ -88,12 +88,9 @@ export async function myRequest() {
 export async function uploadRoomateRequest(formData) {
   useHouseStore.getState().setHouseError(null);
   try {
-    alert("Fired")
     const { data } = await api.post("/housemate/search", formData);
     console.log(formData)
-    if (data.status) {
-      alert("good");
-    }
+    useHouseStore.getState().setHouseMessage(data.message);
     console.log(data)
     return data;
   } catch (error) {
@@ -105,7 +102,6 @@ export async function uploadRoomateRequest(formData) {
 };
 
 export async function allMyRoomateSearchPosts() {
-    alert("Fired")
     try {
         const { data } = await api.get(`/housemate/search/my-search`)
         console.log("my posts", data);

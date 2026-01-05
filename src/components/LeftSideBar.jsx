@@ -42,6 +42,13 @@ export default function LeftSidebar() {
     user?.role === "user" ? { label: "Manage Search", icon: <House size={18} />, href: "/home/housemate-search-management" } : { label: "Ads", icon: <DollarSign size={18} />, href: "/home/ads" },
     { label: "Bookmarks", icon: <Bookmark size={18} />, href: "/home/bookmarks" },
     { label: "Settings / Privacy", icon: <Settings size={18} />, href: "/home/settings" },
+    ...(user?.role === "admin" ? [
+      { label: "Admin Dashboard", icon: <Settings size={18} />, href: "/home/admin" },
+      { label: "Admin: Users", icon: <User size={18} />, href: "/home/admin/users" },
+      { label: "Admin: Houses", icon: <House size={18} />, href: "/home/admin/houses" },
+      { label: "Admin: Roommate Searches", icon: <Search size={18} />, href: "/home/admin/roommate-searches" },
+      { label: "Admin: Reports", icon: <Bell size={18} />, href: "/home/admin/reports" },
+    ] : []),
   ];
 
   const handleDrawerItemClick = (href) => {

@@ -13,7 +13,7 @@ const useAuthStore = create(
 
       // Actions
       setTokens: ({ accessToken }) =>
-        set({ accessToken }),
+      set({ accessToken }),
       setUser: (user) => set({ user }),
       setEmail: (email) => set({ email }),
       setMessage: (message) => set({ message }),

@@ -3,7 +3,7 @@
 import { Plus, Pencil, Trash2, Eye, Heart, X, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import HouseForm from "@/components/forms/UploadHouse";
-import { editlistedHouse, myListings } from "@/utils/axios/houseEndPoints";
+import { editlistedHouse, myListings, deleteHouse, listHouse } from "@/utils/axios/houseEndPoints";
 import useHouseStore from "@/utils/store/useHouseStore";
 import { toast } from "react-toastify";
 

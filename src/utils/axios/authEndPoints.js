@@ -3,6 +3,7 @@ import api from "./axiosInstance";
 
 // User Login
 export async function logUserIn({ email, password }) {
+  useAuthStore.getState().setError("");
   try {
     const { data } = await api.post("/auth/signin", { email, password });
     console.log("login details",data)
@@ -17,7 +18,7 @@ export async function logUserIn({ email, password }) {
   } catch (error) {
     console.log(error)
     console.error("Login failed:", error?.response?.data?.error?.message || error?.message);
-     useAuthStore.getState().setError(error?.response?.data?.error?.message || error?.message);
+    useAuthStore.getState().setError(error?.response?.data?.error?.message || error?.message);
     throw error;
   }
 }

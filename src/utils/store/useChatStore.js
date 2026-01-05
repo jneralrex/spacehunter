@@ -5,7 +5,7 @@ const useChatStore = create((set) => ({
   activeChatId: null,
   activeChatMessages: [],
   userChats: [],
-  
+
   setChatWidgetOpen: (isOpen) => set({ isChatWidgetOpen: isOpen }),
   setActiveChatId: (chatId) => set({ activeChatId: chatId }),
   setActiveChatMessages: (messages) => set({ activeChatMessages: messages }),
@@ -13,8 +13,14 @@ const useChatStore = create((set) => ({
     set((state) => ({
       activeChatMessages: [...state.activeChatMessages, message],
     })),
+  updateMessageStatus: (tempId, updates) =>
+    set((state) => ({
+      activeChatMessages: state.activeChatMessages.map((msg) =>
+        msg._id === tempId ? { ...msg, ...updates } : msg
+      ),
+    })),
   setUserChats: (chats) => set({ userChats: chats }),
-  
+
   resetChatStore: () =>
     set({
       isChatWidgetOpen: false,

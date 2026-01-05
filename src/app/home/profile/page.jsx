@@ -38,7 +38,7 @@ export default function ProfilePage() {
           fullName: res.user.fullName || "",
           username: res.user.username || "",
           phoneNumber: res.user.phoneNumber || "",
-          role:res.user.role,
+          role: res.user.role || "",
           countryOfResidence: res.user.countryOfResidence || "",
           bio: res.user.bio || "",
         });
@@ -53,7 +53,7 @@ export default function ProfilePage() {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-  }, []);
+  }, [setUser]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -179,12 +179,30 @@ export default function ProfilePage() {
         {/* Right: Profile form */}
         <div className="md:col-span-2 bg-white rounded-lg p-6 shadow-sm">
           <form onSubmit={handleSave} className="space-y-4">
-            <input name="fullName" value={form.fullName} onChange={handleChange} placeholder="Full name" className="w-full border rounded px-3 py-2"/>
-            <input name="username" value={form.username} onChange={handleChange} placeholder="Username" className="w-full border rounded px-3 py-2"/>
-            <input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} placeholder="Phone number" className="w-full border rounded px-3 py-2"/>
-            <input name="role" value={form.role} onChange={handleChange} placeholder="Role" className="w-full border rounded px-3 py-2"/>
-            <input name="countryOfResidence" value={form.countryOfResidence} onChange={handleChange} placeholder="Country" className="w-full border rounded px-3 py-2"/>
-            <textarea name="bio" value={form.bio} onChange={handleChange} rows={4} placeholder="Bio" className="w-full border rounded px-3 py-2"></textarea>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input name="fullName" value={form.fullName} onChange={handleChange} placeholder="Full name" className="w-full border rounded px-3 py-2 text-black"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <input name="username" value={form.username} onChange={handleChange} placeholder="Username" className="w-full border rounded px-3 py-2 text-black"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} placeholder="Phone number" className="w-full border rounded px-3 py-2 text-black"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <input name="role" value={form.role} onChange={handleChange} placeholder="Role" className="w-full border rounded px-3 py-2 text-black"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country of Residence</label>
+              <input name="countryOfResidence" value={form.countryOfResidence} onChange={handleChange} placeholder="Country" className="w-full border rounded px-3 py-2 text-black"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <textarea name="bio" value={form.bio} onChange={handleChange} rows={4} placeholder="Bio" className="w-full border rounded px-3 py-2 text-black"></textarea>
+            </div>
 
             <div className="flex gap-3">
               <button type="submit" disabled={saving} className={`px-4 py-2 rounded-md text-white ${saving ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}>
@@ -194,9 +212,10 @@ export default function ProfilePage() {
                 fullName: user?.fullName || "",
                 username: user?.username || "",
                 phoneNumber: user?.phoneNumber || "",
+                role: user?.role || "",
                 countryOfResidence: user?.countryOfResidence || "",
                 bio: user?.bio || "",
-              })} className="px-4 py-2 rounded-md border">
+              })} className="px-4 py-2 rounded-md border text-black">
                 Reset
               </button>
             </div>

@@ -10,17 +10,18 @@ import { toast } from "react-toastify";
 import { initSocket } from "@/utils/socket";
 import Image from "next/image";
 import { IoMdSend } from "react-icons/io";
-import { ChevronsUp, MailPlus } from "lucide-react";
+import { ChevronsUp, MailPlus, Check, CheckCheck, Clock } from "lucide-react";
 
 // IndividualChatView sub-component
 const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
-  const { activeChatMessages, addMessageToActiveChat, setActiveChatMessages } = useChatStore();
+  const { activeChatMessages, addMessageToActiveChat, setActiveChatMessages, updateMessageStatus } = useChatStore();
   const { user } = useAuthStore();
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [errorMessages, setErrorMessages] = useState(null);
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const pendingMessagesRef = useRef(new Set());
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,7 +43,22 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
 
     // Listen for new messages
     socket.on("newMessage", (message) => {
-      addMessageToActiveChat(message); // Use store's add message
+      // Only add if not already added as pending
+      if (!pendingMessagesRef.current.has(message._id)) {
+        addMessageToActiveChat({ ...message, status: "sent" });
+      } else {
+        // Update pending message status to sent
+        updateMessageStatus(message._id, { status: "sent", _id: message._id });
+        pendingMessagesRef.current.delete(message._id);
+      }
+    });
+
+    // Listen for message sent confirmation
+    socket.on("messageSent", (data) => {
+      if (pendingMessagesRef.current.has(data.tempId)) {
+        updateMessageStatus(data.tempId, { _id: data.messageId, status: "sent" });
+        pendingMessagesRef.current.delete(data.tempId);
+      }
     });
 
     // Fetch initial messages
@@ -50,7 +66,10 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
 
     // Disconnect socket on component unmount
     return () => {
-      socket.disconnect();
+      socket.off("joinError");
+      socket.off("newMessage");
+      socket.off("messageSent");
+      pendingMessagesRef.current.clear();
     };
   }, [chatId, otherParticipant]); // Depend on chatId and otherParticipant to re-initialize socket
 
@@ -73,23 +92,28 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
 
     const socket = socketRef.current;
     const receiverId = otherParticipant._id;
+    const tempId = Date.now().toString();
 
-    // Optimistically add message to UI
+    // Optimistically add message to UI with pending status
     const tempMessage = {
-      _id: Date.now().toString(), // Temporary ID
+      _id: tempId,
       chatId,
-      senderId: user ? { _id: user.id } : { _id: "temp_user" }, // Use user.id or a temp id
+      senderId: user ? { _id: user.id } : { _id: "temp_user" },
       receiverId,
       text: newMessage,
       createdAt: new Date().toISOString(),
       isRead: false,
+      status: "pending",
     };
+    
     addMessageToActiveChat(tempMessage);
+    pendingMessagesRef.current.add(tempId);
 
     socket.emit("sendMessage", {
       chatId,
       text: newMessage,
       receiverId,
+      tempId,
     });
 
     setNewMessage("");
@@ -102,6 +126,19 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
   if (errorMessages) {
     return <div className="flex-1 flex items-center justify-center h-full text-2xl text-red-500">{errorMessages + " " + "Please Try Again"}</div>;
   }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "sent":
+        return <CheckCheck size={14} className="inline ml-1 text-white" />;
+      case "pending":
+        return <Clock size={14} className="inline ml-1 text-yellow-400" />;
+      case "failed":
+        return <Check size={14} className="inline ml-1 text-red-400" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -119,6 +156,11 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
               }`}
             >
               <p>{message.text}</p>
+              {message.senderId._id === user?.id && (
+                <span className="text-xs opacity-70">
+                  {getStatusIcon(message.status || "sent")}
+                </span>
+              )}
             </span>
             {index === activeChatMessages.length - 1 && <div ref={messagesEndRef} />}
           </div>

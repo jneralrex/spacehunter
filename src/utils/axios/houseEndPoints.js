@@ -120,7 +120,6 @@ export async function myListings(page = 1, limit = 100) {
 
 export async function singleHouse(id) {
     useHouseStore.getState().setHouseError(null);
-
   try {
     const { data } = await api.get(`/houseupload/single-listings/${id}`);
 
@@ -161,8 +160,19 @@ export  async function getMyBookmarks(){
     return data;
   } catch (error) {
     console.log(error)
-    console.error("Fetching bookmarks failed:", error?.response?.data?.error?.message || error?.message);
-        useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+
+export async function deleteHouse(id) {
+  useHouseStore.getState().setHouseError(null);
+  try {
+    const { data } = await api.delete(`/houseupload/house/${id}`);
+    useHouseStore.getState().setHouseMessage(data.message);
+    return data;
+  } catch (error) {
+    console.error("Deleting house failed:", error?.response?.data?.error?.message || error?.message);
+    useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
     throw error;
   }
 };

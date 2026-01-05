@@ -13,39 +13,38 @@ import {
   FaGlassCheers,
   FaMale,
   FaFemale,
+  FaFlag
 } from "react-icons/fa";
 import Link from "next/link";
 import { sendRequest, singleHouseMate } from "@/utils/axios/houseMatesEndPoints";
 import useHouseStore from "@/utils/store/useHouseStore";
 import { toast } from "react-toastify";
+import ReportModal from "@/components/ReportModal";
 
 const Page = () => {
   const router = useRouter();
   const { id } = useParams();
   const [housemate, setHousemate] = useState(null);
   const [loading, setLoading] = useState(true);
-  const {error, setHouseError} = useHouseStore();
-  const {message, setHouseMessage} = useHouseStore();
+  const { error, setHouseError } = useHouseStore();
+  const { message, setHouseMessage } = useHouseStore();
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  
   const posterId = housemate?.userId?._id;
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      setHouseError(null);
+    }
+  }, [error]);
 
-useEffect(()=>{
-    if(error){
-    toast.error(error);
-    setHouseError(null);
-  }
-}, [error])
-
- useEffect(()=>{
-    if(message){
-    toast.success(message);
-    setHouseMessage(null);}
-  }, [message])
-
-  
-
+  useEffect(() => {
+    if (message) {
+      toast.success(message);
+      setHouseMessage(null);
+    }
+  }, [message]);
 
   const getSingleListing = async () => {
     try {
@@ -61,13 +60,11 @@ useEffect(()=>{
 
   const sendRoomateRequest = async () => {
     try {
-      const res = await sendRequest(posterId)
+      const res = await sendRequest(posterId);
     } catch (error) {
-    console.log("Error fetching housemate details:", error);
-    } finally {
-      setLoading(false);
+      console.log("Error sending request:", error);
     }
-  }
+  };
 
   useEffect(() => {
     getSingleListing();
@@ -94,18 +91,10 @@ useEffect(()=>{
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 py-12 px-6">
-
-      <button
-        className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-10/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]"
-      >
-        <Link
-          href="/find-housemate/browse"
-        >
-          See more
-        </Link>
+      <button className="bg-green-600 text-white p-2 top-[56px] mr-3 mt-2 rounded-lg md:top-9/12 md:bottom-0 right-0 fixed z-40 md:mr-20 md:mb-5 md:h-[50px]">
+        <Link href="/find-housemate/browse">See more</Link>
       </button>
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 relative">
-
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <Image
@@ -119,23 +108,28 @@ useEffect(()=>{
             <h1 className="text-2xl font-bold">{user.username || "Unknown"}</h1>
             {user.dateOfBirth && (
               <p className="text-gray-600 dark:text-gray-400">
-                Age: {new Date().getFullYear() - new Date(user.dateOfBirth).getFullYear()}
+                Age:{" "}
+                {new Date().getFullYear() -
+                  new Date(user.dateOfBirth).getFullYear()}
               </p>
             )}
             <p className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
               <FaMapMarkerAlt className="text-blue-500" />{" "}
-              {location.lgaOrCountyOrDistrict}, {location.state}, {location.country}
+              {location.lgaOrCountyOrDistrict}, {location.state},{" "}
+              {location.country}
             </p>
             <p className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold">
-              <FaMoneyBillWave /> Budget:{" "}
-              {housemate.currency?.toUpperCase()} {housemate.budget?.toLocaleString()}
+              <FaMoneyBillWave /> Budget: {housemate.currency?.toUpperCase()}{" "}
+              {housemate.budget?.toLocaleString()}
             </p>
           </div>
         </div>
 
         {/* Bio / Description */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-center md:text-start">About Me</h2>
+          <h2 className="text-xl font-semibold text-center md:text-start">
+            About Me
+          </h2>
           <p className="text-gray-700 dark:text-gray-300 mt-2 text-center md:text-start">
             Searching for a roommate interested in a {housemate.apartmentType}.
           </p>
@@ -153,15 +147,13 @@ useEffect(()=>{
 
           <div className="flex items-center gap-2 flex-col md:flex-row">
             <div className="flex  items-center gap-2">
-              <FaHeart className="text-blue-500" /> <strong>Marital Status:</strong>{" "}
+              <FaHeart className="text-blue-500" />{" "}
+              <strong>Marital Status:</strong>{" "}
             </div>
-            <p>
-              {user.maritalStatus || "Not specified"}
-            </p>
+            <p>{user.maritalStatus || "Not specified"}</p>
           </div>
 
           <div className="grid grid-cols-2 md:flex flex-col gap-2">
-
             <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
                 <FaSmoking className="text-blue-500" /> <strong>Smoking:</strong>{" "}
@@ -171,21 +163,23 @@ useEffect(()=>{
 
             <div className="flex items-center gap-2 flex-col md:flex-row">
               <div className="flex items-center gap-2">
-                <FaGlassCheers className="text-blue-500" /> <strong>Alcohol:</strong>{" "}
+                <FaGlassCheers className="text-blue-500" />{" "}
+                <strong>Alcohol:</strong>{" "}
               </div>
 
               {user.habit?.alcohol || "Not specified"}
             </div>
 
-
             <div className="flex items-center gap-2">
               {user.gender === "female" ? (
                 <>
-                  <FaFemale className="text-pink-500" /> <strong>Gender:</strong> Female
+                  <FaFemale className="text-pink-500" />{" "}
+                  <strong>Gender:</strong> Female
                 </>
               ) : (
                 <>
-                  <FaMale className="text-blue-500" /> <strong>Gender:</strong> Male
+                  <FaMale className="text-blue-500" /> <strong>Gender:</strong>{" "}
+                  Male
                 </>
               )}
             </div>
@@ -219,17 +213,37 @@ useEffect(()=>{
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex gap-3 flex-col sm:flex-row">
+        <div className="mt-8 flex gap-3 flex-col sm:flex-row items-center justify-between">
+          <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
+            <button
+              onClick={() => router.back()}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition"
+            >
+              Back to Listings
+            </button>
+            <button
+              className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-green-700 transition"
+              onClick={sendRoomateRequest}
+            >
+              Send Request
+            </button>
+          </div>
+
           <button
-            onClick={() => router.back()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition"
+            onClick={() => setIsReportModalOpen(true)}
+            className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium transition mt-4 sm:mt-0 cursor-pointer"
           >
-            Back to Listings
-          </button>
-          <button className="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-green-700 transition" onClick={sendRoomateRequest}>
-            Send Request
+            <FaFlag size={14} />
+            Report
           </button>
         </div>
+
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetModel="RoommateSearch"
+          targetId={id}
+        />
       </div>
     </div>
   );

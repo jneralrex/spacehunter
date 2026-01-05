@@ -10,6 +10,7 @@ const MainLayout = ({ children }) => {
   const pathname = usePathname();
 
   const noNavPaths = [
+    "/",
     "/auth/sign-in",
     "/auth/sign-up",
     "/auth/verify-otp",
