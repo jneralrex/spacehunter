@@ -33,7 +33,7 @@ export default function LeftSidebar() {
     { label: "Home", icon: <Home size={22} />, href: "/home" },
     { label: "Explore", icon: <Search size={22} />, href: "/home/explore" },
     { label: "Notifications", icon: <Bell size={22} />, href: "/home/notifications" },
-    { label: "Requests", icon: <User size={22} />, href: "/home/requests" },
+    user?.role === "user" || user?.role === "owner" ? { label: "Requests", icon: <User size={22} />, href: "/home/requests" } : "",
     { label: "More", icon: <MoreHorizontal size={22} />, action: openDrawer },
   ];
 
@@ -86,25 +86,26 @@ export default function LeftSidebar() {
         </nav>
 
         {/* CTA depending on user role */}
-        {user?.role === "user" ? (
-          <div className="w-full mt-8">
+        <div className="w-full mt-8">
+          {user?.role === "user" && (
             <button
               onClick={() => router.push("/home/housemate-search-management")}
               className="w-full bg-green-600 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Search
             </button>
-          </div>
-        ) : (
-          <div className="w-full mt-8">
+          )}
+
+          {user?.role === "owner" && (
             <button
               onClick={() => router.push("/home/listing-management")}
               className="w-full bg-green-600 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Listings
             </button>
-          </div>
-        )}
+          )}
+        </div>
+
       </aside>
 
       {/* Mobile Bottom Nav */}
@@ -131,9 +132,8 @@ export default function LeftSidebar() {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-full md:w-[300px] bg-[#000000]/95 shadow-2xl z-[9999] transform transition-all duration-300 ${
-          drawerOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
-        }`}
+        className={`fixed top-0 left-0 h-full w-full md:w-[300px] bg-[#000000]/95 shadow-2xl z-[9999] transform transition-all duration-300 ${drawerOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+          }`}
       >
         {/* Header */}
         <div className="flex justify-between items-center px-5 py-[22px] border-b text-white border-white/10">
@@ -152,7 +152,7 @@ export default function LeftSidebar() {
             <button
               key={idx}
               onClick={() => handleDrawerItemClick(item.href)}
-              className="flex items-center gap-3 w-full px-4 py-2 bg-white rounded-lg transition"
+              className="flex items-center gap-3 w-full px-4 py-2 bg-white rounded-lg transition md:text-[14px]"
             >
               {item.icon}
               <span>{item.label}</span>

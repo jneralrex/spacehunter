@@ -42,7 +42,7 @@ export default function AdminDashboard() {
         <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
         <p className="text-neutral-400 mb-8">Welcome back, Admin. Select a section to manage.</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
           {cards.map((card, idx) => (
             <Link key={idx} href={card.href} className={`block p-6 rounded-2xl border transition-all ${card.color}`}>
               <div className="flex items-start gap-4">
