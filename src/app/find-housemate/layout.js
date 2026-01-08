@@ -8,7 +8,7 @@ import useAuthStore from "@/utils/store/useAuthStore";
 
   return (
     <>
-      {!user._id && <Navbar />}
+      {(!user || !user._id) && <Navbar />}
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>
