@@ -88,9 +88,9 @@ const HouseDetail = () => {
   };
 
   useEffect(() => {
-    if (!id) return;
+    if (!user?.id) return;
     getSingleListing();
-  }, [id]);
+  }, [user]);
 
 
 

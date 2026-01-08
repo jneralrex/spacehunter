@@ -148,19 +148,19 @@ export default function ExplorePage() {
   }, [fetchExploreData]);
 
   const renderTrendingFeed = (items) => (
-    <div className="mt-6">
+    <div className="mt-3 sm:mt-6">
       {items.map((item) => (
-        <Link href={`/find-house/more-details/${item._id}`} key={item._id} className="block px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs text-neutral-400">Trending in {item.location?.state || "Unknown"}</p>
-              <p className="mt-1 font-medium text-base">{item.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">
-                {item.interestCount || 0} people interested • ₦{item.price?.toLocaleString()} / {item.rentType}
+        <Link href={`/find-house/more-details/${item._id}`} key={item._id} className="block px-3 sm:px-4 py-3 sm:py-4 border-b border-white/10 hover:bg-white/5 transition-colors">
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-xs text-neutral-400">Trending in {item.location?.state || "Unknown"}</p>
+              <p className="mt-1 font-medium text-sm sm:text-base line-clamp-2">{item.title}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500 mt-1 line-clamp-1">
+                {item.interestCount || 0} interested • ₦{item.price?.toLocaleString()} / {item.rentType}
               </p>
             </div>
             {item.images?.[0]?.url && (
-              <img src={item.images[0].url} className="w-16 h-16 rounded-lg object-cover ml-4" alt={item.title} />
+              <img src={item.images[0].url} className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0" alt={item.title} />
             )}
           </div>
         </Link>
@@ -169,25 +169,25 @@ export default function ExplorePage() {
   );
 
   const renderHousemates = (items) => (
-    <div className="px-4 py-6 border-b border-white/10">
-      <p className="font-semibold mb-4 flex items-center gap-2">
-        <Users size={18} className="text-green-500" /> Housemates For You
+    <div className="px-3 sm:px-4 py-4 sm:py-6 border-b border-white/10">
+      <p className="font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+        <Users size={18} className="text-green-500 flex-shrink-0" /> Housemates For You
       </p>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {items.map((mate) => (
-          <Link href={`/find-housemate/browse/user/more-details/${mate._id}`} key={mate._id} className="flex items-center gap-3 hover:bg-white/5 p-2 rounded-xl transition-colors">
+          <Link href={`/find-housemate/browse/user/more-details/${mate._id}`} key={mate._id} className="flex items-center gap-3 hover:bg-white/5 p-2 sm:p-2.5 rounded-lg sm:rounded-xl transition-colors">
             <img
               src={mate.userId?.profilePics?.url || "https://randomuser.me/api/portraits/placeholder.jpg"}
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
               alt={mate.userId?.username}
             />
-            <div className="flex-1">
-              <p className="font-medium text-sm">{mate.userId?.username}</p>
-              <p className="text-xs text-neutral-500">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm line-clamp-1">{mate.userId?.username}</p>
+              <p className="text-xs text-neutral-500 line-clamp-1">
                 Looking in {mate.location?.lgaOrCountyOrDistrict}, {mate.location?.state}
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex-shrink-0">
               <p className="text-xs font-semibold text-green-500">₦{mate.budget?.toLocaleString()}</p>
               <p className="text-[10px] text-neutral-500">{mate.userId?.gender}</p>
             </div>
@@ -199,21 +199,21 @@ export default function ExplorePage() {
   );
 
   const renderPopularAreas = (areas) => (
-    <div className="px-4 py-6 border-b border-white/10">
-      <p className="font-semibold mb-4 flex items-center gap-2">
-        <MapPin size={18} className="text-blue-500" /> Popular Areas
+    <div className="px-3 sm:px-4 py-4 sm:py-6 border-b border-white/10">
+      <p className="font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+        <MapPin size={18} className="text-blue-500 flex-shrink-0" /> Popular Areas
       </p>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
         {areas.map((area, i) => (
-          <div key={i} className="bg-neutral-800/40 p-3 rounded-xl border border-white/5 cursor-pointer" onClick={() => {
+          <div key={i} className="bg-neutral-800/40 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border border-white/5 cursor-pointer hover:border-white/10 transition" onClick={() => {
               setActiveTab("Near You");
               fetchNearbyByLocation(area.area);
           }}>
-            <p className="font-medium text-sm">{area.area}</p>
-            <p className="text-xs text-neutral-500">{area.state}</p>
-            <div className="mt-2 flex justify-between items-center text-[10px]">
+            <p className="font-medium text-xs sm:text-sm truncate">{area.area}</p>
+            <p className="text-[10px] sm:text-xs text-neutral-500 truncate">{area.state}</p>
+            <div className="mt-2 flex justify-between items-center text-[10px] gap-1">
               <span className="text-green-500 font-bold">{area.count} listings</span>
-              <span className="text-neutral-400">avg. ₦{area.avgPrice?.toLocaleString()}</span>
+              <span className="text-neutral-400 truncate">avg. ₦{area.avgPrice?.toLocaleString()}</span>
             </div>
           </div>
         ))}
@@ -222,35 +222,35 @@ export default function ExplorePage() {
   );
 
   return (
-    <div className="min-h-screen text-white container lg:max-w-[80%] xl:max-w-[85%] max-w-full lg:ml-auto">
+    <div className="min-h-screen text-white container max-w-full lg:max-w-[80%] xl:max-w-[85%] lg:ml-auto">
       {/* SEARCH BAR */}
-      <div className="sticky top-0 z-50 bg-neutral-900/80 backdrop-blur-md px-4 py-3 border-b border-white/10">
-        <div className="flex items-center gap-2 bg-neutral-800/70 border border-white/10 px-3 py-2 rounded-full">
-          <Search size={18} className="text-neutral-400" />
+      <div className="sticky top-0 z-50 bg-neutral-900/80 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-3 border-b border-white/10">
+        <div className="flex items-center gap-2 bg-neutral-800/70 border border-white/10 px-3 py-2.5 sm:py-2 rounded-full">
+          <Search size={18} className="text-neutral-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search areas, prices, house types..."
-            className="bg-transparent w-full outline-none text-sm"
+            placeholder="Search areas, prices..."
+            className="bg-transparent w-full outline-none text-sm sm:text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearch}
           />
           {searchQuery && (
-              <X size={18} className="text-neutral-400 cursor-pointer" onClick={() => setSearchQuery("")} />
+              <X size={18} className="text-neutral-400 cursor-pointer flex-shrink-0" onClick={() => setSearchQuery("")} />
           )}
-          <SlidersHorizontal size={18} className="text-neutral-400" />
+          <SlidersHorizontal size={18} className="text-neutral-400 flex-shrink-0 hidden sm:block" />
         </div>
       </div>
 
       {/* TABS */}
-      <div className="flex gap-4 overflow-x-auto px-4 py-3 border-b border-white/10 no-scrollbar">
+      <div className="flex gap-2 sm:gap-4 overflow-x-auto px-3 sm:px-4 py-3 border-b border-white/10 no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-sm whitespace-nowrap transition-all ${
+            className={`pb-2 text-xs sm:text-sm whitespace-nowrap transition-all font-medium ${
               activeTab === tab
-                ? "text-green-600 font-medium border-b-2 border-green-600"
+                ? "text-green-600 border-b-2 border-green-600"
                 : "text-neutral-400 hover:text-white"
             }`}
           >
@@ -270,17 +270,17 @@ export default function ExplorePage() {
             <>
               {/* SPOTLIGHT BANNER */}
               {data.trending.length > 0 && (
-                <div className="mt-4 px-4">
-                  <Link href={`/find-house/more-details/${data.trending[0]._id}`} className="relative h-56 w-full rounded-2xl overflow-hidden block group">
+                <div className="mt-3 sm:mt-4 px-3 sm:px-4">
+                  <Link href={`/find-house/more-details/${data.trending[0]._id}`} className="relative h-40 sm:h-56 w-full rounded-xl sm:rounded-2xl overflow-hidden block group">
                     <img
                       src={data.trending[0].images?.[0]?.url || "https://images.unsplash.com/photo-1507089947368-19c1da9775ae"}
                       alt="Featured"
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 flex flex-col justify-end">
-                      <p className="text-xs text-green-400 font-bold mb-1">🔥 HOT THIS WEEK IN {data.trending[0].location?.state?.toUpperCase() || "UNKNOWN"}</p>
-                      <p className="text-xl font-bold">{data.trending[0].title}</p>
-                      <p className="text-sm text-neutral-300 mt-1">₦{data.trending[0].price?.toLocaleString()} • {data.trending[0].interestCount || 0} interests</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 sm:p-6 flex flex-col justify-end">
+                      <p className="text-[10px] sm:text-xs text-green-400 font-bold mb-1">🔥 HOT THIS WEEK</p>
+                      <p className="text-base sm:text-xl font-bold line-clamp-2">{data.trending[0].title}</p>
+                      <p className="text-xs sm:text-sm text-neutral-300 mt-1">₦{data.trending[0].price?.toLocaleString()} • {data.trending[0].interestCount || 0} interests</p>
                     </div>
                   </Link>
                 </div>
@@ -291,49 +291,27 @@ export default function ExplorePage() {
               {data.popularAreas.length > 0 && renderPopularAreas(data.popularAreas.slice(0, 4))}
 
               {renderHousemates(data.suggestedHousemates.slice(0, 3))}
-
-              {/* CURATED SECTION PREVIEW */}
-              {/* <div className="px-4 py-6 border-b border-white/10"> */}
-                {/* <p className="font-semibold mb-3">Recently Added</p> */}
-                {/* <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                  {data.trending.slice(4).map((house) => (
-                    <Link href={`/find-house/more-details/${house._id}`} key={house._id} className="min-w-[200px] group">
-                      <div className="h-28 rounded-xl overflow-hidden bg-neutral-800 border border-white/10 relative">
-                        <img
-                          src={house.images?.[0]?.url || "https://images.unsplash.com/photo-1560448075-bb485b067938"}
-                          className="w-full h-full object-cover transition-opacity group-hover:opacity-100 opacity-80"
-                          alt={house.title}
-                        />
-                        <div className="absolute bottom-2 left-2 right-2">
-                           <p className="text-[10px] bg-black/60 backdrop-blur-md px-2 py-1 rounded-full w-fit">₦{house.price?.toLocaleString()}</p>
-                        </div>
-                      </div>
-                      <p className="text-xs mt-2 font-medium truncate">{house.title}</p>
-                    </Link>
-                  ))}
-                </div> */}
-              {/* </div> */}
             </>
           )}
 
           {activeTab === "Trending Rentals" && renderTrendingFeed(data.trending)}
           {activeTab === "Near You" && (
-            <div className="mt-4 px-4">
+            <div className="mt-4 px-3 sm:px-4">
               {locationError && (
                 <div className="mb-6 p-4 bg-neutral-800/50 rounded-xl border border-white/10">
-                  <p className="text-neutral-400 text-sm mb-3 text-center">{locationError}</p>
-                  <div className="flex gap-2">
+                  <p className="text-neutral-400 text-xs sm:text-sm mb-3 text-center">{locationError}</p>
+                  <div className="flex flex-col sm:flex-row gap-2">
                       <input 
                         type="text" 
                         placeholder="Enter your city (e.g. Lekki)" 
-                        className="bg-neutral-900 border border-white/10 rounded-full px-4 py-2 text-sm w-full outline-none"
+                        className="bg-neutral-900 border border-white/10 rounded-full px-4 py-2.5 sm:py-2 text-sm w-full outline-none"
                         value={manualLocation}
                         onChange={(e) => setManualLocation(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGetNearby(manualLocation)}
                       />
                       <button 
                         onClick={() => handleGetNearby(manualLocation)}
-                        className="bg-green-600 text-white rounded-full px-4 py-2 text-sm font-medium"
+                        className="bg-green-600 text-white rounded-full px-6 sm:px-4 py-2.5 sm:py-2 text-sm font-medium whitespace-nowrap"
                       >
                           Search
                       </button>
@@ -344,7 +322,7 @@ export default function ExplorePage() {
               {!locationError && data.nearby.length === 0 && (
                   <div className="p-10 text-center text-neutral-400">
                       <MapPin className="mx-auto mb-4" size={48} />
-                      <p>Searching for houses near you...</p>
+                      <p className="text-sm">Searching for houses near you...</p>
                   </div>
               )}
 
