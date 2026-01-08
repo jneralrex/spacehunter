@@ -88,11 +88,10 @@ const HouseDetail = () => {
   };
 
   useEffect(() => {
-    if (!user?._id) return;
+    if (!id) return;
     getSingleListing();
-  }, [user]);
+  }, [id]);
 
-  console.log("house", user);
 
 
   // ---- HANDLE INTEREST TOGGLE ----
