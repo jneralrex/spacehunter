@@ -99,7 +99,7 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
     const tempMessage = {
       _id: tempId,
       chatId,
-      senderId: user ? { _id: user._id  } : { _id: "temp_user" },
+      senderId: user ? { _id: user.id } : { _id: "temp_user" },
       receiverId,
       text: newMessage,
       createdAt: new Date().toISOString(),
@@ -149,11 +149,11 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
         {activeChatMessages.map((message, index) => (
           <div
             key={message._id}
-            className={`mb-2 flex ${message.senderId._id === user?._id  ? "justify-end" : "justify-start"}`}
+            className={`mb-2 flex ${message.senderId._id === user?.id ? "justify-end" : "justify-start"}`}
           >
             <span
               className={`inline-block p-2 rounded-lg max-w-[60%] break-words ${
-                message.senderId._id === user?._id 
+                message.senderId._id === user?.id
                   ? "bg-blue-400 text-white"
                   : "bg-gray-700 text-white"
               }`}
@@ -161,7 +161,7 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
               <p>{message.text}</p>
               <span className="text-xs opacity-70 flex items-center justify-end text-white">
                 {formatMessageTime(message.createdAt)}
-                {message.senderId._id === user?._id  && getStatusIcon(message.isRead)}
+                {message.senderId._id === user?.id && getStatusIcon(message.isRead)}
               </span>
             </span>
             {index === activeChatMessages.length - 1 && <div ref={messagesEndRef} />}
@@ -232,7 +232,7 @@ const ChatWidget = () => {
   };
 
   const currentActiveChat = userChats.find(chat => chat._id === activeChatId);
-  const otherParticipant = currentActiveChat?.members.find(member => member._id !== user?._id );
+  const otherParticipant = currentActiveChat?.members.find(member => member._id !== user?.id);
 
 
   return (
@@ -314,7 +314,7 @@ const ChatWidget = () => {
                     <div className="p-3 text-gray-400">No chats found.</div>
                   ) : (
                     userChats.map((chat) => {
-                      const otherMember = chat.members.find(member => member._id !== user?._id );
+                      const otherMember = chat.members.find(member => member._id !== user?.id);
                       return (
                         <div
                           key={chat._id}
