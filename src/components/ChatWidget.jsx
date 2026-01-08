@@ -145,7 +145,7 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
 
   return (
     <div className="flex flex-col ">
-      <div className="flex-1 overflow-y-auto p-3 text-white max-h-[480px]">
+      <div className="flex-1 overflow-y-auto p-3 text-white max-h-[520px] md:max-h-[480px]">
         {activeChatMessages.map((message, index) => (
           <div
             key={message._id}
