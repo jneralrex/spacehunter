@@ -127,7 +127,7 @@ export async function singleHouse(id) {
 
     return data;
   } catch (error) {
-    console.log(error)
+    console.log("house error",error)
     console.error("Uploading roommate request failed:", error?.response?.data?.error?.message || error?.message);
         useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
 
@@ -176,3 +176,50 @@ export async function deleteHouse(id) {
     throw error;
   }
 };
+
+export async function getTrendingHouses(limit = 5) {
+  try {
+    const { data } = await api.get(`/houseupload/explore/trending?limit=${limit}`);
+    return data;
+  } catch (error) {
+    console.error("Fetching trending houses failed:", error);
+    throw error;
+  }
+}
+
+export async function getPopularAreas() {
+  try {
+    const { data } = await api.get("/houseupload/explore/popular-areas");
+    return data;
+  } catch (error) {
+    console.error("Fetching popular areas failed:", error);
+    throw error;
+  }
+}
+
+export async function getCuratedHouses(type = "affordable") {
+  try {
+    const { data } = await api.get(`/houseupload/explore/curated?type=${type}`);
+    return data;
+  } catch (error) {
+    console.error(`Fetching curated houses (${type}) failed:`, error);
+    throw error;
+  }
+}
+
+export async function getNearbyHouses(params) {
+  try {
+    const { lat, lng, location, radius = 5000 } = params;
+    let url = "/houseupload/listings/nearby?";
+    if (lat && lng) {
+      url += `lat=${lat}&lng=${lng}&radius=${radius}`;
+    } else if (location) {
+      url += `location=${location}&radius=${radius}`;
+    }
+    const { data } = await api.get(url);
+    return data;
+  } catch (error) {
+    console.error("Fetching nearby houses failed:", error);
+    throw error;
+  }
+}

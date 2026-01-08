@@ -78,6 +78,7 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
       setLoadingMessages(true);
       const response = await axiosInstance.get(chatEndPoints.GET_MESSAGES(chatId));
       setActiveChatMessages(response.data.messages); // Use store's set messages
+      console.log("Fetched messages:", response.data.messages);
     } catch (err) {
       setErrorMessages(err.response?.data?.message || err.message );
       console.error(err);
@@ -98,7 +99,7 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
     const tempMessage = {
       _id: tempId,
       chatId,
-      senderId: user ? { _id: user.id } : { _id: "temp_user" },
+      senderId: user ? { _id: user._id  } : { _id: "temp_user" },
       receiverId,
       text: newMessage,
       createdAt: new Date().toISOString(),
@@ -127,40 +128,41 @@ const IndividualChatView = ({ chatId, otherParticipant, goBackToChatList }) => {
     return <div className="flex-1 flex items-center justify-center h-full text-2xl text-red-500">{errorMessages + " " + "Please Try Again"}</div>;
   }
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "sent":
-        return <CheckCheck size={14} className="inline ml-1 text-white" />;
-      case "pending":
-        return <Clock size={14} className="inline ml-1 text-yellow-400" />;
-      case "failed":
-        return <Check size={14} className="inline ml-1 text-red-400" />;
-      default:
-        return null;
+  const getStatusIcon = (isRead) => {
+    if (isRead) {
+      return <CheckCheck size={14} className="inline ml-1 text-white" />;
+    } else {
+      return <Check size={14} className="inline ml-1 text-white" />;
     }
+  };
+
+  const formatMessageTime = (createdAt) => {
+    const date = new Date(createdAt);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-3 text-white max-h-[480px]">
+      <div className="flex-1 overflow-y-auto p-3 text-white max-h-[400px] md:max-h-[480px]">
         {activeChatMessages.map((message, index) => (
           <div
             key={message._id}
-            className={`mb-2 ${message.senderId._id === user?.id ? "text-right" : "text-left"}`}
+            className={`mb-2 flex ${message.senderId._id === user?._id  ? "justify-end" : "justify-start"}`}
           >
             <span
-              className={`inline-block p-2 rounded-lg max-w-[80%] break-words ${
-                message.senderId._id === user?.id
-                  ? "bg-blue-600 text-white"
+              className={`inline-block p-2 rounded-lg max-w-[60%] break-words ${
+                message.senderId._id === user?._id 
+                  ? "bg-blue-400 text-white"
                   : "bg-gray-700 text-white"
               }`}
             >
               <p>{message.text}</p>
-              {message.senderId._id === user?.id && (
-                <span className="text-xs opacity-70">
-                  {getStatusIcon(message.status || "sent")}
-                </span>
-              )}
+              <span className="text-xs opacity-70 flex items-center justify-end text-white">
+                {formatMessageTime(message.createdAt)}
+                {message.senderId._id === user?._id  && getStatusIcon(message.isRead)}
+              </span>
             </span>
             {index === activeChatMessages.length - 1 && <div ref={messagesEndRef} />}
           </div>
@@ -220,6 +222,7 @@ const ChatWidget = () => {
       setLoadingChats(true);
       const response = await axiosInstance.get(chatEndPoints.GET_MY_CHATS);
       setUserChats(response.data.chats);
+      console.log("Fetched chats:", response.data.chats);
     } catch (err) {
       setErrorChats(err.response?.data?.message || err.message );
       console.error(err);
@@ -229,7 +232,7 @@ const ChatWidget = () => {
   };
 
   const currentActiveChat = userChats.find(chat => chat._id === activeChatId);
-  const otherParticipant = currentActiveChat?.members.find(member => member._id !== user?.id);
+  const otherParticipant = currentActiveChat?.members.find(member => member._id !== user?._id );
 
 
   return (
@@ -261,7 +264,7 @@ const ChatWidget = () => {
       {isChatWidgetOpen && (
         <div
           className={`fixed bottom-0 right-0 bg-gray-800 border border-gray-700  shadow-xl z-50 flex flex-col
-            ${isMinimized ? "w-80 h-16" : "w-[400px] h-[600px]"}
+            ${isMinimized ? "w-80 h-16" : "w-full h-full md:w-[400px] md:h-[600px]"}
           `}
         >
           {/* Chat Header */}
@@ -277,7 +280,7 @@ const ChatWidget = () => {
                     alt={otherParticipant?.username || "User"}
                     width={30}
                     height={30}
-                    className="rounded-full mr-2"
+                    className="rounded-full mr-2 size-[30px]"
                 />
                 <h3 className="text-lg font-semibold">{otherParticipant?.username || "User"}</h3>
               </div>
@@ -311,7 +314,7 @@ const ChatWidget = () => {
                     <div className="p-3 text-gray-400">No chats found.</div>
                   ) : (
                     userChats.map((chat) => {
-                      const otherMember = chat.members.find(member => member._id !== user?.id);
+                      const otherMember = chat.members.find(member => member._id !== user?._id );
                       return (
                         <div
                           key={chat._id}
@@ -323,7 +326,7 @@ const ChatWidget = () => {
                             alt={otherMember?.username || "User"}
                             width={40}
                             height={40}
-                            className="rounded-full mr-3"
+                            className="rounded-full mr-3 size-[30px]"
                           />
                           <div>
                             <p className="font-semibold text-white">{otherMember?.username || "User"}</p>

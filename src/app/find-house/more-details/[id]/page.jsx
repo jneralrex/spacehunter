@@ -74,22 +74,25 @@ const HouseDetail = () => {
       setHouse(res.data);
       setEngagement(res.engagement);
 
-      const userId = user?.id;
+      const userId = user?._id;
       const interestedList = res.engagement?.interestedUsers || [];
 
       setInterested(interestedList.some((u) => u._id === userId));
 
     } catch (error) {
       console.error("Error fetching house:", error);
+      console.log("error", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?._id) return;
     getSingleListing();
   }, [user]);
+
+  console.log("house", user);
 
 
   // ---- HANDLE INTEREST TOGGLE ----
@@ -100,7 +103,7 @@ const HouseDetail = () => {
 
       setEngagement(res.engagement);
 
-      const userId = user?.id;
+      const userId = user?._id;
       const interestedList = res.engagement.interestedUsers || [];
 
       setInterested(interestedList.some((u) => u._id === userId));

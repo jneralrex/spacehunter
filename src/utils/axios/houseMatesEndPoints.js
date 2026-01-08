@@ -112,3 +112,13 @@ export async function allMyRoomateSearchPosts() {
         throw error;
     }
 };
+
+export async function getSuggestedHousemates() {
+    try {
+        const { data } = await api.get("/housemate/search/explore/suggested");
+        return data;
+    } catch (error) {
+        console.error("Fetching suggested housemates failed:", error);
+        throw error;
+    }
+}

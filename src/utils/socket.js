@@ -1,8 +1,8 @@
 import { io } from "socket.io-client";
 import useAuthStore from "./store/useAuthStore";
 
-const URL = process.env.NODE_ENV === "production" ? "https://housematter-api.onrender.com" : "http://localhost:5000";
-// const URL = "https://housematter-api.onrender.com"
+// const URL = process.env.NODE_ENV === "production" ? "https://housematter-api.onrender.com" : "http://localhost:5000";
+const URL = "https://housematter-api.onrender.com"
 
 let socket = null;
 
