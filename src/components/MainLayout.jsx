@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import useAuthStore from "@/utils/store/useAuthStore";
 import ChatWidget from "./ChatWidget"; 
+import { getCurrentUser } from "@/utils/axios/userEndPoints";
 
 const MainLayout = ({ children }) => {
-  const { user } = useAuthStore();
+  const { user, accessToken, setUser } = useAuthStore();
   const pathname = usePathname();
 
   const noNavPaths = [
@@ -18,6 +19,20 @@ const MainLayout = ({ children }) => {
   ];
 
   const showNav = !noNavPaths.includes(pathname);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (accessToken && !user) {
+        try {
+          const res = await getCurrentUser();
+          setUser(res.user);
+        } catch (error) {
+          console.error("Failed to fetch user in layout:", error);
+        }
+      }
+    };
+    fetchUser();
+  }, [accessToken, user, setUser]);
 
   return (
     <>

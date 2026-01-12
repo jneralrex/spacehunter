@@ -93,7 +93,7 @@ export async function forgotPassword({email}) {
     return data;
   } catch (error) {
     useAuthStore.getState().setError(error.response?.data || error?.response?.data?.error?.message || error?.message);
-    console.error("Password Change failed:", err.response?.data || err.message);
+    console.error("Password Change failed:", error.response?.data || error.message);
     throw err;
   }
 };
@@ -103,16 +103,17 @@ export async function changePassword({ oldPassword, newPassword }) {
   try {
     // const email = useAuthStore.getState().email;
 
-    const { data } = await api.post("auth/change-password", { oldPassword, newPassword } );
+    const { data } = await api.put("auth/change-password", { oldPassword, newPassword } );
 
     console.log("Password Change:", data);
 
     return data;
   } catch (error) {
 
+   useAuthStore.getState().setError(error?.response?.data?.error?.message || error?.message);
+    console.error("Password Change failed:", error.response?.data || error.message);
+        console.error("Password Change failed:", error);
 
-   useAuthStore.getState().setError(error.response?.data || error?.response?.data?.error?.message || error?.message);
-    console.error("Password Change failed:", err.response?.data || err.message);
     throw err;
   }
 };
@@ -130,7 +131,7 @@ export async function resetPassword({ oldPassword, newPassword }) {
   } catch (error) {
        useAuthStore.getState().setError(error.response?.data || error?.response?.data?.error?.message || error?.message);
 
-    console.error("Password Change failed:", err.response?.data || err.message);
+    console.error("Password Change failed:", error.response?.data || error.message);
     throw err;
   }
 };

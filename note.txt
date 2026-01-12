@@ -1,1 +1,0 @@
-on the development frontend the the layouts are working as expected but the hosted link isnt and even the find-house/more-details too, its not showing i think becasue of the !user?._id thing
