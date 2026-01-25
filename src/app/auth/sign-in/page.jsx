@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import useLoadingStore from "@/utils/store/useLoading";
 import { logUserIn } from "@/utils/axios/authEndPoints";
 import useAuthStore from "@/utils/store/useAuthStore";
+import { useEffect } from "react";
 
 export default function LandlordSignIn() {
   const { register, handleSubmit } = useForm();
@@ -29,6 +30,10 @@ export default function LandlordSignIn() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    useAuthStore.getState().setError("");
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
