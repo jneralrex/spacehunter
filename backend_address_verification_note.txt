@@ -1,0 +1,22 @@
+**Backend Note: Address Verification Issue**
+
+The frontend is encountering a `400 Bad Request` error when calling the `/verify-address` endpoint, with the message: `"Could not resolve coordinates for the provided address."`
+
+**Action Required:**
+
+Please investigate the backend implementation of the `verifyAddress` controller (`controllers/house/house.controller.js`) and the `utils/getCoordinates.js` function.
+
+Specifically, check the following:
+
+1.  **Input Validation/Formatting:** Ensure that the address string received from the frontend is correctly parsed, cleaned, and formatted before being passed to the external geocoding service.
+2.  **Geocoding Service Status:** Verify the functionality and response of the external geocoding service (e.g., Google Maps Geocoding API, OpenStreetMap Nominatim, etc.) that `getCoordinates.js` is utilizing.
+    *   Confirm the service is operational and accessible from the backend environment.
+    *   Check for correct API key configuration and usage (if the service requires one).
+    *   Monitor for any rate limiting or query limits imposed by the geocoding service.
+    *   Examine the raw error messages or responses returned by the geocoding service itself.
+3.  **Detailed Logging:** Implement comprehensive logging within `utils/getCoordinates.js` to inspect:
+    *   The exact address string received.
+    *   The request sent to the geocoding service.
+    *   The raw response received from the geocoding service (including any error codes or messages).
+
+The frontend `AddressVerification` component is correctly structured to consume the `lat` and `lng` coordinates provided by this endpoint. Once this backend issue is resolved, the map functionality will work as intended, allowing users to verify and fine-tune locations.

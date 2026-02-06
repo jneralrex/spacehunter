@@ -4,6 +4,7 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 import Head from "next/head";
 import ToastProvider from "@/components/ToastProvider";
 import MainLayout from "@/components/MainLayout"; // Import MainLayout
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,17 +71,23 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <Head>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#000000]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LoadingOverlay/>
-        <MainLayout>{children}</MainLayout>
-        <ToastProvider />
-
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <LoadingOverlay/>
+          <MainLayout>{children}</MainLayout>
+          <ToastProvider />
+        </ThemeProvider>
       </body>
     </html>
   );

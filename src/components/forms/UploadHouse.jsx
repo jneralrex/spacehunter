@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { Upload, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import useHouseStore from "@/utils/store/useHouseStore";
+import dynamic from 'next/dynamic';
+
+const AddressVerification = dynamic(() => import('@/components/AddressVerification'), { ssr: false });
 
 export default function HouseForm({ initialData = null, onSubmit }) {
   const [loading, setLoading] = useState(false);
@@ -44,6 +47,7 @@ export default function HouseForm({ initialData = null, onSubmit }) {
     livingRooms: [],
     garage: [],
   });
+  const [coordinates, setCoordinates] = useState(null);
 
   // Sync form with initialData whenever it changes
   useEffect(() => {
@@ -74,6 +78,10 @@ export default function HouseForm({ initialData = null, onSubmit }) {
           streetAddress: initialData.location?.streetAddress || "",
         },
       });
+
+      if (initialData.lat && initialData.lng) {
+        setCoordinates({ lat: initialData.lat, lng: initialData.lng });
+      }
 
       setImages(initialData.images || []);
       setCategoryImages({
@@ -142,6 +150,13 @@ export default function HouseForm({ initialData = null, onSubmit }) {
         "amenities",
         JSON.stringify(form.amenities.split(",").map((a) => a.trim()))
       );
+
+      if (coordinates) {
+        fd.append("lat", coordinates.lat);
+        fd.append("lng", coordinates.lng);
+      } else {
+        console.log("No coordinates to submit");
+      }
 
       if (initialData) {
         fd.append("existingImages", JSON.stringify(initialData.images || []));
@@ -266,23 +281,30 @@ export default function HouseForm({ initialData = null, onSubmit }) {
       </div>
 
       {/* LOCATION */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        {["country", "state", "lgaOrCountyOrDistrict", "streetAddress"].map(
-          (field) => (
-            <div key={field}>
-              <label className="block mb-1 capitalize">
-                {field.replace(/([A-Z])/g, " $1")}
-              </label>
-              <input
-                name={field}
-                value={form.location[field]}
-                onChange={handleLocationChange}
-                required
-                className="w-full p-3 rounded-lg bg-neutral-800 border border-white/10"
-              />
-            </div>
-          )
-        )}
+      <div className="space-y-4 rounded-lg border border-white/10 p-4">
+        <h3 className="text-lg font-medium">Property Location</h3>
+        <div className="grid lg:grid-cols-2 gap-4">
+          {["country", "state", "lgaOrCountyOrDistrict", "streetAddress"].map(
+            (field) => (
+              <div key={field}>
+                <label className="block mb-1 capitalize">
+                  {field.replace(/([A-Z])/g, " $1")}
+                </label>
+                <input
+                  name={field}
+                  value={form.location[field]}
+                  onChange={handleLocationChange}
+                  required
+                  className="w-full p-3 rounded-lg bg-neutral-800 border border-white/10"
+                />
+              </div>
+            )
+          )}
+        </div>
+        <div>
+          <label className="block mb-2">Verify Address & Pin on Map</label>
+          <AddressVerification setCoordinates={setCoordinates} />
+        </div>
       </div>
 
       {/* AMENITIES */}
@@ -447,4 +469,4 @@ export default function HouseForm({ initialData = null, onSubmit }) {
       </button>
     </form>
   );
-}
+} 

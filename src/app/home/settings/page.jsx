@@ -10,6 +10,7 @@ import {
 import { changePassword } from "@/utils/axios/authEndPoints";
 import useAuthStore from "@/utils/store/useAuthStore";
 import { Eye, EyeOff } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 
 
@@ -154,13 +155,16 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading) return <p>Loading profile…</p>;
 
   return (
-    <div className="min-h-screen text-white container lg:max-w-[80%] xl:max-w-[85%] max-w-full lg:ml-auto pb-20">
+    <div className="min-h-screen container lg:max-w-[80%] xl:max-w-[85%] max-w-full lg:ml-auto pb-20">
       <h1 className="text-2xl font-semibold mb-6">Settings</h1>
-
+      <div className="flex items-center">
+        <span>Switch Themes</span>
+        <ThemeToggle />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
         {/* Left: Profile photo */}
         <div className="bg-white rounded-lg p-4 shadow-sm flex flex-col items-center h-fit">
           <div className="w-40 h-40 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -255,7 +259,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex gap-3">
-                <button type="submit" disabled={saving} className={`px-4 py-2 rounded-md text-white text-sm md:text-lg ${saving ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}>
+                <button type="submit" disabled={saving} className={`px-2 md:px-4 py-2 rounded-md text-white text-sm md:text-lg ${saving ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}>
                   {saving ? "Saving…" : "Save Changes"}
                 </button>
                 <button type="button" onClick={() => setForm({
@@ -329,7 +333,7 @@ export default function ProfilePage() {
               <button 
                 type="submit" 
                 disabled={passwordLoading} 
-                className={`px-4 py-2 rounded-md text-white ${passwordLoading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"}`}
+                className={`px-4 py-2 rounded-md text-white ${passwordLoading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}
               >
                 {passwordLoading ? "Updating…" : "Update Password"}
               </button>

@@ -223,3 +223,12 @@ export async function getNearbyHouses(params) {
     throw error;
   }
 }
+
+export async function verifyAddress(address) {
+    try {
+        const response = await api.post('/houseupload/verify-address', { address });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

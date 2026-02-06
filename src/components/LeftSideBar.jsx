@@ -21,7 +21,7 @@ import useNotificationStore from "@/utils/store/useNotificationStore";
 
 export default function LeftSidebar() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const  {user}  = useAuthStore();
   const unreadCount = useNotificationStore((state) => state.unreadCount);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -33,15 +33,18 @@ export default function LeftSidebar() {
     { label: "Home", icon: <Home size={22} />, href: "/home" },
     { label: "Explore", icon: <Search size={22} />, href: "/home/explore" },
     { label: "Notifications", icon: <Bell size={22} />, href: "/home/notifications" },
-    user?.role === "user" || user?.role === "owner" ? { label: "Requests", icon: <User size={22} />, href: "/home/requests" } : "",
+    user?.role === "user" ? { label: "Requests", icon: <User size={22} />, href: "/home/requests" } : "",
     { label: "More", icon: <MoreHorizontal size={22} />, action: openDrawer },
   ];
 
   const drawerItems = [
-    { label: "Manage Listings", icon: <House size={18} />, href: "/home/listing-management" },
-    user?.role === "user" ? { label: "Manage Search", icon: <House size={18} />, href: "/home/housemate-search-management" } : { label: "Ads", icon: <DollarSign size={18} />, href: "/home/ads" },
+    ...(user?.role === "owner" ? [{ label: "Manage Listings", icon: <House size={18} />, href: "/home/listing-management" }] : []),
+    ...(user?.role === "user" ?  [
+      { label: "Manage Search", icon: <House size={18} />, href: "/home/housemate-search-management" },
+    ] : [
+    ]),
     { label: "Bookmarks", icon: <Bookmark size={18} />, href: "/home/bookmarks" },
-    { label: "Settings / Privacy", icon: <Settings size={18} />, href: "/home/settings" },
+    { label: "Settings & Privacy", icon: <Settings size={18} />, href: "/home/settings" },
     ...(user?.role === "admin" ? [
       { label: "Admin Dashboard", icon: <Settings size={18} />, href: "/home/admin" },
       { label: "Admin: Users", icon: <User size={18} />, href: "/home/admin/users" },
@@ -49,6 +52,7 @@ export default function LeftSidebar() {
       { label: "Admin: Roommate Searches", icon: <Search size={18} />, href: "/home/admin/roommate-searches" },
       { label: "Admin: Reports", icon: <Bell size={18} />, href: "/home/admin/reports" },
     ] : []),
+    { label: "Ads", icon: <DollarSign size={18} />, href: "/home/ads" },
   ];
 
   const handleDrawerItemClick = (href) => {
@@ -56,12 +60,14 @@ export default function LeftSidebar() {
     closeDrawer();
   };
 
+  console.log(user.role, "user")
+
   return (
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col items-center border-r border-green-100 py-4 fixed min-h-screen px-3">
         <nav className="space-y-6 pt-4">
-          <Link href="/" className="flex z-40 font-semibold text-2xl text-white">
+          <Link href="/" className="flex z-40 font-semibold text-2xl">
             spacee <span className="text-green-600">hunters</span>
           </Link>
 
@@ -69,13 +75,13 @@ export default function LeftSidebar() {
             <button
               key={idx}
               onClick={item.href ? () => router.push(item.href) : item.action}
-              className="relative flex items-center gap-3 text-white hover:text-green-600 font-medium transition"
+              className="relative flex items-center gap-3 hover:text-green-600 font-medium transition"
             >
               {item.icon}
 
               {/* Notification badge (Desktop) */}
               {item.label === "Notifications" && unreadCount > 0 && (
-                <span className="absolute -top-1 left-2 bg-red-600 text-white text-[10px] px-2 py-[1px] rounded-full">
+                <span className="absolute -top-1 left-2 bg-red-600 text-[10px] px-2 py-[1px] rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -90,7 +96,7 @@ export default function LeftSidebar() {
           {user?.role === "user" && (
             <button
               onClick={() => router.push("/home/housemate-search-management")}
-              className="w-full bg-green-600 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
+              className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Search
             </button>
@@ -98,8 +104,8 @@ export default function LeftSidebar() {
 
           {user?.role === "owner" && (
             <button
-              onClick={() => router.push("/home/listing-management")}
-              className="w-full bg-green-600 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
+            onClick={() => router.push("/home/listing-management")}
+            className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Listings
             </button>
@@ -120,7 +126,7 @@ export default function LeftSidebar() {
 
             {/* Notification badge (Mobile) */}
             {item.label === "Notifications" && unreadCount > 0 && (
-              <span className="absolute -top-1 left-6 bg-red-600 text-white text-[10px] px-1.5 py-[1px] rounded-full">
+              <span className="absolute -top-1 left-6 bg-red-600 text-[10px] px-1.5 py-[1px] rounded-full">
                 {unreadCount}
               </span>
             )}
@@ -136,11 +142,11 @@ export default function LeftSidebar() {
           }`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center px-5 py-[22px] border-b text-white border-white/10">
-          <h2 className="text-lg font-semibold">More Options</h2>
+        <div className="flex justify-between items-center px-5 py-[22px] border-b border-white/10">
+          <h2 className="text-lg font-semibold text-white">More Options</h2>
           <button
             onClick={closeDrawer}
-            className="p-2 hover:bg-neutral-800 rounded-full transition"
+            className="p-2 bg-neutral-600 hover:bg-neutral-800 rounded-full transition"
           >
             <X size={20} />
           </button>
@@ -152,10 +158,10 @@ export default function LeftSidebar() {
             <button
               key={idx}
               onClick={() => handleDrawerItemClick(item.href)}
-              className="flex items-center gap-3 w-full px-4 py-2 bg-white rounded-lg transition md:text-[14px]"
+              className="flex items-center gap-3 text-black w-full px-4 py-2 bg-white rounded-lg transition md:text-[14px]"
             >
               {item.icon}
-              <span>{item.label}</span>
+              <span className="">{item.label}</span>
             </button>
           ))}
         </div>
