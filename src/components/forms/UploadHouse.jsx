@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Upload, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import useHouseStore from "@/utils/store/useHouseStore";
@@ -109,6 +109,19 @@ export default function HouseForm({ initialData = null, onSubmit }) {
     const { name, checked } = e.target;
     setForm((prev) => ({ ...prev, [name]: checked }));
   };
+
+  const handleAddressDetailsUpdate = useCallback((newDetails) => {
+    setForm((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        country: newDetails.country || prev.location.country,
+        state: newDetails.state || prev.location.state,
+        lgaOrCountyOrDistrict: newDetails.lgaOrCountyOrDistrict || prev.location.lgaOrCountyOrDistrict,
+        streetAddress: newDetails.streetAddress || prev.location.streetAddress,
+      },
+    }));
+  }, []);
 
   const handleAddMainImages = (files) => {
     setImages((prev) => [...prev, ...Array.from(files).slice(0, 10 - prev.length)]);
@@ -303,7 +316,10 @@ export default function HouseForm({ initialData = null, onSubmit }) {
         </div>
         <div>
           <label className="block mb-2">Verify Address & Pin on Map</label>
-          <AddressVerification setCoordinates={setCoordinates} />
+          <AddressVerification
+            setCoordinates={setCoordinates}
+            onAddressDetailsChange={handleAddressDetailsUpdate}
+          />
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -14,11 +14,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-const AddressVerification = ({ setCoordinates }) => {
+const AddressVerification = ({ setCoordinates, onAddressDetailsChange }) => {
   const [address, setAddress] = useState('');
   const [coords, setCoords] = useState(null);
   const [verifiedAddress, setVerifiedAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [reverseGeocodingLoading, setReverseGeocodingLoading] = useState(false);
 
   const handleVerifyAddress = async () => {
     if (!address) {
@@ -33,6 +34,7 @@ const AddressVerification = ({ setCoordinates }) => {
       setCoords(newCoords);
       setCoordinates(newCoords);
       setVerifiedAddress(formattedAddress);
+      // Don't call onAddressDetailsChange here, let useEffect handle it for consistency
       toast.success("Address verified successfully!");
     } catch (error) {
       console.error('Error verifying address:', error);
@@ -41,6 +43,51 @@ const AddressVerification = ({ setCoordinates }) => {
       setLoading(false);
     }
   };
+
+  // Effect for reverse geocoding when coords change
+  useEffect(() => {
+    async function reverseGeocode() {
+      if (!coords) {
+        setVerifiedAddress('');
+        onAddressDetailsChange({});
+        return;
+      }
+
+      setReverseGeocodingLoading(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}`
+        );
+        const data = await response.json();
+
+        if (data && data.address) {
+          const newFormattedAddress = data.display_name;
+          setVerifiedAddress(newFormattedAddress);
+
+          // Extract relevant details for the form
+          const addressDetails = {
+            country: data.address.country || "",
+            state: data.address.state || data.address.state_district || data.address.ISO3166_2_lvl4 || "",
+            lgaOrCountyOrDistrict: data.address.county || data.address.municipality || data.address.town || data.address.city || data.address.village || "",
+            streetAddress: data.address.road || data.address.house_number || "",
+          };
+          onAddressDetailsChange(addressDetails);
+        } else {
+          setVerifiedAddress('Unknown location');
+          onAddressDetailsChange({});
+        }
+      } catch (error) {
+        console.error('Error during reverse geocoding:', error);
+        setVerifiedAddress('Error getting address details');
+        onAddressDetailsChange({});
+      } finally {
+        setReverseGeocodingLoading(false);
+      }
+    }
+
+    reverseGeocode();
+  }, [coords, onAddressDetailsChange]);
+
 
   const LocationMarker = () => {
     const map = useMapEvents({
@@ -91,7 +138,7 @@ const AddressVerification = ({ setCoordinates }) => {
       {coords && (
         <div className='mt-4'>
           <p className='text-sm mb-2'>
-            <b>Verified Address:</b> {verifiedAddress}
+            <b>Verified Address:</b> {reverseGeocodingLoading ? 'Loading address details...' : verifiedAddress}
           </p>
           <div className='rounded-lg overflow-hidden border border-white/10'>
             <MapContainer
@@ -100,8 +147,8 @@ const AddressVerification = ({ setCoordinates }) => {
               style={{ height: '400px', width: '100%' }}
             >
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
               />
               <LocationMarker />
             </MapContainer>
