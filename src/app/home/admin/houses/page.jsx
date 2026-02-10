@@ -20,7 +20,7 @@ export default function AdminHouses() {
       if (res.success) {
         setHouses(res.houses);
         setPagination({
-          totalUsers: res.totalHouses, // reuse the field for houses total
+          totalUsers: res.totalHouses, 
           totalPages: res.totalPages,
           currentPage: res.currentPage
         });
