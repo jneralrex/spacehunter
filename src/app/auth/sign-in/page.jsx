@@ -49,7 +49,7 @@ export default function LandlordSignIn() {
             placeholder="youremail@email.com"
             type="email"
             {...register("email")}
-            className="w-full p-3 border rounded-md"
+            className="w-full p-3 border rounded-md text-black"
             required
           />
           <input
@@ -57,7 +57,7 @@ export default function LandlordSignIn() {
             {...register("password")}
             placeholder="Password"
             required
-            className="w-full p-3 border rounded-md"
+            className="w-full p-3 border rounded-md text-black"
           />
           <button
             disabled={loading}
@@ -68,7 +68,7 @@ export default function LandlordSignIn() {
           </button>
         </form>
 
-        <p className="text-center mt-4 text-sm">
+        <p className="text-center mt-4 text-sm text-black">
           Don't have an account?{" "}
           <Link href="/auth/sign-up" className="text-green-600 font-semibold">
             Sign Up
