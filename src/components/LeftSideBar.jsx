@@ -174,5 +174,5 @@ console.log("user", user?.user?.role)
         ></div>
       )}
     </>
-  );
+  )
 }
