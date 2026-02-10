@@ -38,7 +38,7 @@ export default function LandlordSignIn() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="bg-white p-8 shadow-md rounded-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-4">Sign In</h2>
+        <h2 className="text-2xl font-bold text-center mb-4 text-black">Sign In</h2>
         {error && (
           <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
             {error + " " + "Please try again."}
