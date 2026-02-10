@@ -21,7 +21,7 @@ import useNotificationStore from "@/utils/store/useNotificationStore";
 
 export default function LeftSidebar() {
   const router = useRouter();
-  const  {user}  = useAuthStore();
+  const  user  = useAuthStore();
   const unreadCount = useNotificationStore((state) => state.unreadCount);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -33,19 +33,19 @@ export default function LeftSidebar() {
     { label: "Home", icon: <Home size={22} />, href: "/home" },
     { label: "Explore", icon: <Search size={22} />, href: "/home/explore" },
     { label: "Notifications", icon: <Bell size={22} />, href: "/home/notifications" },
-    user?.role === "user" ? { label: "Requests", icon: <User size={22} />, href: "/home/requests" } : "",
+    user?.user?.role === "user" ? { label: "Requests", icon: <User size={22} />, href: "/home/requests" } : "",
     { label: "More", icon: <MoreHorizontal size={22} />, action: openDrawer },
   ];
 
   const drawerItems = [
-    ...(user?.role === "owner" ? [{ label: "Manage Listings", icon: <House size={18} />, href: "/home/listing-management" }] : []),
-    ...(user?.role === "user" ?  [
+    ...(user?.user?.user?.role === "owner" ? [{ label: "Manage Listings", icon: <House size={18} />, href: "/home/listing-management" }] : []),
+    ...(user?.user?.user?.role === "user" ?  [
       { label: "Manage Search", icon: <House size={18} />, href: "/home/housemate-search-management" },
     ] : [
     ]),
     { label: "Bookmarks", icon: <Bookmark size={18} />, href: "/home/bookmarks" },
     { label: "Settings & Privacy", icon: <Settings size={18} />, href: "/home/settings" },
-    ...(user?.role === "admin" ? [
+    ...(user?.user?.role === "admin" ? [
       { label: "Admin Dashboard", icon: <Settings size={18} />, href: "/home/admin" },
       { label: "Admin: Users", icon: <User size={18} />, href: "/home/admin/users" },
       { label: "Admin: Houses", icon: <House size={18} />, href: "/home/admin/houses" },
@@ -60,8 +60,7 @@ export default function LeftSidebar() {
     closeDrawer();
   };
 
-  console.log(user.role, "user")
-
+console.log("user", user?.user?.role)
   return (
     <>
       {/* Desktop Sidebar */}
@@ -93,7 +92,7 @@ export default function LeftSidebar() {
 
         {/* CTA depending on user role */}
         <div className="w-full mt-8">
-          {user?.role === "user" && (
+          {user?.user?.role === "user" && (
             <button
               onClick={() => router.push("/home/housemate-search-management")}
               className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
@@ -102,7 +101,7 @@ export default function LeftSidebar() {
             </button>
           )}
 
-          {user?.role === "owner" && (
+          {user?.user?.role === "owner" && (
             <button
             onClick={() => router.push("/home/listing-management")}
             className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
