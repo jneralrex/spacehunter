@@ -101,6 +101,23 @@ export async function uploadRoomateRequest(formData) {
   }
 };
 
+export async function updateRoomateRequest(formData) {
+  useHouseStore.getState().setHouseError(null);
+  try {
+    const { _id, ...data } = formData;
+    const response = await api.patch("/housemate/search", data);
+    console.log(response)
+    useHouseStore.getState().setHouseMessage(response.data.message);
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.log("error", error)
+    console.error("Updating roommate request failed:", error?.response?.data?.error?.message || error?.message);
+    useHouseStore.getState().setHouseError(error?.response?.data?.error?.message || error?.message);
+    throw error;
+  }
+};
+
 export async function allMyRoomateSearchPosts() {
     try {
         const { data } = await api.get(`/housemate/search/my-search`)

@@ -4,7 +4,8 @@ import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { 
   allMyRoomateSearchPosts, 
-  uploadRoomateRequest 
+  uploadRoomateRequest,
+  updateRoomateRequest
 } from "@/utils/axios/houseMatesEndPoints";
 
 export default function RequestHouseMatePage() {
@@ -101,7 +102,11 @@ export default function RequestHouseMatePage() {
     e.preventDefault();
 
     try {
-      await uploadRoomateRequest(formData);
+      if (editingPost) {
+        await updateRoomateRequest(formData);
+      } else {
+        await uploadRoomateRequest(formData);
+      }
 
       closeDrawer();
       getPosts();
