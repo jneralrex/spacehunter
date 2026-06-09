@@ -14,9 +14,9 @@ export default function RightSideBar() {
   return (
     <>
       {/* RIGHT SIDEBAR */}
-      <aside className=" hidden sm:flex flex-col border-l border-green-100 px-4 py-4 space-y-6 max-h-screen overflow-auto hide-scrollbar top-0">
+      <aside className=" hidden sm:flex flex-col border-l border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-4 space-y-6 max-h-screen overflow-auto hide-scrollbar top-0">
         {/* Profile */}
-        <div className="bg-white rounded-2xl shadow flex flex-col p-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow dark:shadow-slate-800 flex flex-col p-4">
           <div className="flex items-center gap-3 ">
             <Image
               src={user?.profilePics?.url}
@@ -26,10 +26,10 @@ export default function RightSideBar() {
               className="rounded-full size-[50px] object-cover"
             />
             <div>
-              <h3 className="font-semibold text-gray-950">{user?.username}</h3>
+              <h3 className="font-semibold text-slate-950 dark:text-slate-100">{user?.username}</h3>
             </div>
           </div>
-          <button className="mt-4 bg-black text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition">
+          <button className="mt-4 bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition">
             <Link href="/home/settings">
               Settings
             </Link>
@@ -37,12 +37,12 @@ export default function RightSideBar() {
         </div>
 
         {/* Featured Spaces */}
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h3 className="font-semibold mb-4 text-2xl text-gray-950">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow dark:shadow-slate-800 p-6">
+          <h3 className="font-semibold mb-4 text-2xl text-slate-950 dark:text-slate-100">
             Featured Spaces
           </h3>
 
-          <ul className="grid grid-cols-1 sm:grid-cols-1 lg:rid-cols-3 gap-4 text-sm text-gray-600 max-h-[200px] overflow-auto">
+          <ul className="grid grid-cols-1 sm:grid-cols-1 lg:rid-cols-3 gap-4 text-sm text-slate-600 dark:text-slate-400 max-h-[200px] overflow-auto">
             {[
               { icon: <House className="w-6 h-6" />, label: "Apartment in Ikeja" },
               { icon: <Printer className="w-6 h-6" />, label: "Workspace in Lekki" },
@@ -50,9 +50,9 @@ export default function RightSideBar() {
             ].map((item, i) => (
               <li
                 key={i}
-                className="flex flex-col items-center justify-center text-center border border-green-300 p-4 rounded-xl hover:bg-green-100 hover:shadow-md transition-all duration-300 "
+                className="flex flex-col items-center justify-center text-center border border-blue-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-700 hover:shadow-md dark:hover:shadow-slate-800 transition-all duration-300 "
               >
-                <div className="mb-2 transform hover:scale-110 transition-transform">
+                <div className="mb-2 transform hover:scale-110 transition-transform text-slate-700 dark:text-slate-300">
                   {item.icon}
                 </div>
                 <p className="text-sm font-medium">{item.label}</p>
@@ -62,12 +62,12 @@ export default function RightSideBar() {
         </div>
 
         {/* Ads / Promotions */}
-        <div className="bg-white rounded-2xl shadow p-4">
-          <h3 className="font-semibold mb-2 flex gap-2 text-2xl text-gray-950 items-center "><Megaphone /> Sponsored</h3>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow dark:shadow-slate-800 p-4">
+          <h3 className="font-semibold mb-2 flex gap-2 text-2xl text-slate-950 dark:text-slate-100 items-center "><Megaphone /> Sponsored</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Promote your space and reach thousands of renters daily.
           </p>
-          <button className="mt-3 bg-black text-white w-full py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition">
+          <button className="mt-3 bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white w-full py-2 rounded-full text-sm font-semibold transition">
             Advertise Now
           </button>
         </div>

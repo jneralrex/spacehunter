@@ -64,17 +64,17 @@ console.log("user", user?.user?.role)
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col items-center border-r border-green-100 py-4 fixed min-h-screen px-3">
+      <aside className="hidden lg:flex flex-col items-center border-r border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-950 py-4 fixed min-h-screen px-3">
         <nav className="space-y-6 pt-4">
-          <Link href="/" className="flex z-40 font-semibold text-2xl">
-            spacee <span className="text-green-600">hunters</span>
+          <Link href="/" className="flex z-40 font-semibold text-2xl text-slate-900 dark:text-slate-100">
+            spacee <span className="text-blue-600 dark:text-blue-400">hunters</span>
           </Link>
 
           {navItems.map((item, idx) => (
             <button
               key={idx}
               onClick={item.href ? () => router.push(item.href) : item.action}
-              className="relative flex items-center gap-3 hover:text-green-600 font-medium transition"
+              className="relative flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition"
             >
               {item.icon}
 
@@ -95,7 +95,7 @@ console.log("user", user?.user?.role)
           {user?.user?.role === "user" && (
             <button
               onClick={() => router.push("/home/housemate-search-management")}
-              className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
+              className="w-full bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Search
             </button>
@@ -104,7 +104,7 @@ console.log("user", user?.user?.role)
           {user?.user?.role === "owner" && (
             <button
             onClick={() => router.push("/home/listing-management")}
-            className="w-full bg-green-600 p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
+            className="w-full bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white p-3 rounded-full font-semibold text-center cursor-pointer transition max-w-[200px]"
             >
               Manage Listings
             </button>
@@ -114,12 +114,12 @@ console.log("user", user?.user?.role)
       </aside>
 
       {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-green-100 flex justify-around items-center py-2 px-4 shadow-lg lg:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-blue-100 dark:border-slate-700 flex justify-around items-center py-2 px-4 shadow-lg lg:hidden z-50">
         {navItems.map((item, idx) => (
           <button
             key={idx}
             onClick={item.href ? () => router.push(item.href) : item.action}
-            className="relative flex flex-col items-center text-gray-700 hover:text-green-700 text-sm"
+            className="relative flex flex-col items-center text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm"
           >
             {item.icon}
 

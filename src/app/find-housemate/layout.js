@@ -10,7 +10,7 @@ export default function WithLayout({ children }) {
     <>
       {(!user || !user.id) && <Navbar />}
       <main className="min-h-screen">{children}</main>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

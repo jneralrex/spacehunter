@@ -41,3 +41,9 @@ note.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# text files
+.txt
+
+# markdown files
+.md

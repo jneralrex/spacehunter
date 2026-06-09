@@ -75,11 +75,11 @@ export default function HomePage() {
 
   return (
     <>
-      <main className="min-h-screen text-green-700 container lg:max-w-[85%] max-w-full lg:ml-auto ">
+      <main className="min-h-screen text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-950 container lg:max-w-[85%] max-w-full lg:ml-auto ">
 
         <div className=" grid grid-cols-1 sm:flex gap-6 items-center">
           <section className="max-h-screen overflow-y-auto hide-scrollbar grid grid-cols-1 md:ml-6">
-            <header className="sticky top-0 bg-white/80 backdrop-blur-lg py-4 md:rounded-b-lg border-b border-green-100 z-10 overflow-x-auto overflow-y-hidden h-[60px] max-w-[800px] flex items-center lg:m-auto px-3">
+            <header className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg py-4 md:rounded-b-lg border-b border-blue-100 dark:border-slate-800 z-10 overflow-x-auto overflow-y-hidden h-[60px] max-w-[800px] flex items-center lg:m-auto px-3 lg:px-0">
               <FeedTabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
             </header>
             <div className="pb-10 lg:pl-3 xl:pl-0 ">
