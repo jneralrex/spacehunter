@@ -60,14 +60,13 @@ export default function LeftSidebar() {
     closeDrawer();
   };
 
-console.log("user", user?.user?.role)
   return (
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col items-center border-r border-blue-100 dark:border-slate-700 bg-white dark:bg-slate-950 py-4 fixed min-h-screen px-3">
         <nav className="space-y-6 pt-4">
           <Link href="/" className="flex z-40 font-semibold text-2xl text-slate-900 dark:text-slate-100">
-            spacee <span className="text-blue-600 dark:text-blue-400">hunters</span>
+            spacee <span className="text-blue-600 dark:text-blue-400">hunter</span>
           </Link>
 
           {navItems.map((item, idx) => (
