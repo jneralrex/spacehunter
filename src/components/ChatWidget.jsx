@@ -82,7 +82,6 @@ const IndividualChatView = ({
   const [newMessage, setNewMessage] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [errorMessages, setErrorMessages] = useState(null);
-  const [sending, setSending] = useState(false);
 
   const socketRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -130,7 +129,16 @@ const IndividualChatView = ({
           if (id) seenMessageIdsRef.current.add(id);
         });
 
-        setActiveChatMessages(messages);
+        setActiveChatMessages(
+          messages.map((message) => ({
+            ...message,
+            status:
+              message.status === "pending"
+                ? "pending"
+                : "sent",
+            isRead: Boolean(message.isRead),
+          }))
+        );
       } catch (error) {
         if (cancelled) return;
 
@@ -210,24 +218,41 @@ const IndividualChatView = ({
     };
 
     const handleMessageSent = (data) => {
-      if (!data?.tempId || !data?.messageId) {
-        console.warn("Unexpected messageSent payload:", data);
+      console.log("messageSent acknowledgement:", data);
+
+      const tempId = data?.tempId;
+      const messageId =
+        data?.messageId ||
+        data?.message?._id ||
+        data?._id;
+
+      if (!tempId) {
+        console.warn("Acknowledgement is missing tempId:", data);
         return;
       }
 
-      if (!pendingMessagesRef.current.has(String(data.tempId))) {
+      const normalizedTempId = String(tempId);
+
+      if (!pendingMessagesRef.current.has(normalizedTempId)) {
         return;
       }
 
-      // Replace the temporary ID with the server-generated ID.
-      updateMessageStatus(String(data.tempId), {
-        _id: String(data.messageId),
+      if (!messageId) {
+        console.warn(
+          "Message acknowledgement is missing the saved message ID:",
+          data
+        );
+        return;
+      }
+
+      updateMessageStatus(normalizedTempId, {
+        _id: String(messageId),
         status: "sent",
+        isRead: Boolean(data?.message?.isRead ?? data?.isRead ?? false),
       });
 
-      pendingMessagesRef.current.delete(String(data.tempId));
-      seenMessageIdsRef.current.add(String(data.messageId));
-      setSending(false);
+      pendingMessagesRef.current.delete(normalizedTempId);
+      seenMessageIdsRef.current.add(String(messageId));
     };
 
     const handleConnectError = (error) => {
